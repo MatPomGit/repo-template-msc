@@ -1,6 +1,7 @@
 ---
 title: "[Tytuł naukowy P01]"
-author: "[Autorzy]"
+author:
+  - name: "Mateusz Pomianek"
 lang: pl
 format: html
 bibliography: references.bib
