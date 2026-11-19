@@ -3,7 +3,8 @@
 **Typ:** samodzielny projekt manuskryptowy `msc-*`  
 **Program:** `arc-neuro` / `arc-ai` / `arc-xr` / `arc-robo` (wybrać jeden główny)  
 **Status:** planowany; brak wyników empirycznych  
-**Wersja szablonu:** 1.0.0
+**Wersja szablonu:** 1.0.0  
+**Autor podstawowy:** Mateusz Pomianek (pozostaje w każdym projekcie); dodatkowi współautorzy: opcjonalnie, po potwierdzeniu wkładu
 
 ## Cel i wkład naukowy
 
@@ -33,6 +34,10 @@ python -m unittest discover -s tests -v
 # po uzupełnieniu materiałów gotowych do publikacji:
 python scripts/validate_repository.py --root . --phase publish
 ```
+
+## Audyt wzorca
+
+Zidentyfikowane braki, priorytety oraz kryteria akceptacji: [audyt z 2026-11-19](reviews/2026-11-19-template-audit.md). Publiczne repozytoria mogą używać GitHub-hosted runners do bezpiecznych kontroli CI; nie jest to jeszcze skonfigurowany workflow.
 
 ## Własność i licencja
 
