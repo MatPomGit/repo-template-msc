@@ -129,6 +129,19 @@ def validate_manuscript(manuscript: Path, require_setup: bool = False) -> list[s
         return sorted(set(errors + ["Unreadable bibliography/manuscript source"]))
     errors.extend(issues)
     errors.extend(f"Missing Zotero citation key: {key}" for key in sorted(needed - available))
+    # Prevent a valid Zotero export from silently differing from the BibTeX
+    # resource actually used by the primary LaTeX manuscript.
+    main_tex = manuscript / "main.tex"
+    if main_tex.is_file() and not main_tex.is_symlink():
+        declarations = re.findall(
+            r"\\bibliography\s*\{([^{}]+)\}",
+            without_tex_comments(main_tex.read_text(encoding="utf-8")),
+        )
+        if declarations:
+            declared = {part.strip() for item in declarations
+                        for part in item.split(",") if part.strip()}
+            if Path(filename).stem not in declared:
+                errors.append("LaTeX bibliography disagrees with Zotero export filename")
     if require_setup:
         if cfg.get("auto_export_status") != "configured":
             errors.append("Zotero auto-export setup not confirmed by owner")
@@ -160,7 +173,7 @@ def main(argv: list[str] | None = None) -> int:
     for issue in problems:
         print("FAIL:", issue)
     print(f"zotero-contract: {'FAIL' if problems else 'PASS'};"
-          f" configured_manuscripts={count}; Zotero live sync NOT_VERIFIED")
+          f" manuscripts_with_descriptor={count}; Zotero live sync NOT_VERIFIED")
     return 1 if problems else 0
 
 

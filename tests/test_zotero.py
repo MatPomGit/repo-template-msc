@@ -105,6 +105,24 @@ class ZoteroContractTests(unittest.TestCase):
         self.assertIn("Unsafe Zotero bibliography filename",
                       checker.validate_manuscript(self.paper))
 
+    def test_latex_bibliography_must_match_zotero_export(self):
+        cfg = self.paper / "zotero.json"
+        data = json.loads(cfg.read_text(encoding="utf-8"))
+        data["bibliography"] = "other.bib"
+        cfg.write_text(json.dumps(data), encoding="utf-8")
+        (self.paper / "other.bib").write_text(
+            "@article{key1, title={One}}\n", encoding="utf-8")
+        self.assertIn("LaTeX bibliography disagrees with Zotero export filename",
+                      checker.validate_manuscript(self.paper))
+
+    def test_citation_with_optional_natbib_note(self):
+        (self.paper / "references.bib").write_text(
+            "@article{smith2024, title={Paper}}\n", encoding="utf-8")
+        m = self.paper / "main.tex"
+        m.write_text(m.read_text() + r"\citep[see][p. 12]{smith2024}",
+                     encoding="utf-8")
+        self.assertEqual([], checker.validate_manuscript(self.paper))
+
     def test_discovery_of_opted_in_manuscripts(self):
         errors, count = checker.validate_root(Path(self.temp.name))
         self.assertEqual(([], 1), (errors, count))
