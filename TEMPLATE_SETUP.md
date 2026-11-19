@@ -33,3 +33,7 @@ Nowe `msc-*` otrzymują `manuscripts/P01/main.tex`, `references.bib`, `manuscrip
 ## Obowiązkowe wydzielenie TikZ
 
 Dla nowych manuskryptów LaTeX rysunki TikZ umieszczaj w `manuscripts/P01/figures/` (jeden rysunek w jednym pliku `.tex`). `main.tex` zawiera jedynie `\input{figures/study-workflow.tex}`. Nie przenoś środowiska `tikzpicture` do dokumentu głównego. Zachowuj podpisy i identyfikatory `\label`, uwzględnij pliki `figures/*.tex` w archiwum źródłowym i przygotuj dodatkowy format grafiki zgodnie z wymaganiami konkretnego czasopisma. Szablon zawiera wyłącznie schemat demonstracyjny, który należy zastąpić przed zgłoszeniem.
+
+## Zotero / Better BibTeX
+
+Dla każdego manuskryptu utwórz lokalnie kolekcję Zotero i ustaw automatyczny eksport translatora Better BibTeX z opcją **Keep updated** do odpowiedniego `references.bib`. Nie eksportuj notatek, adnotacji ani załączników. Po prawdziwej konfiguracji zmień status w `zotero.json` na `configured`. Do pierwszego zgłoszenia użyj `python scripts/check_zotero.py --root . --require-setup`; CI korzysta z odczytowego trybu offline. Instrukcje: [docs/zotero.md](docs/zotero.md).

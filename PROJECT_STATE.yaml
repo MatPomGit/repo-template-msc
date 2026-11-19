@@ -1,5 +1,5 @@
 schema_version: 1
-template_version: 1.1.0
+template_version: 1.2.0
 project_id: REPLACE_PROJECT_ID
 repository_type: manuscript
 programme: unassigned
@@ -16,6 +16,9 @@ manuscript_root: manuscripts
 manuscript_format: latex
 manuscript_source: manuscripts/P01/main.tex
 bibliography_path: manuscripts/P01/references.bib
+bibliography_manager: zotero
+bibliography_exporter: better-bibtex
+bibliography_auto_export_status: not_configured
 journal_profile: generic-latex
 protocol_path: research/protocol.md
 analysis_plan_path: research/analysis-plan.md

@@ -3,7 +3,7 @@
 **Typ:** samodzielny projekt manuskryptowy `msc-*`  
 **Program:** `arc-neuro` / `arc-ai` / `arc-xr` / `arc-robo` (wybrać jeden główny)  
 **Status:** planowany; brak wyników empirycznych  
-**Wersja szablonu:** 1.1.0  
+**Wersja szablonu:** 1.2.0  
 **Autor podstawowy:** Mateusz Pomianek (pozostaje w każdym projekcie); dodatkowi współautorzy: opcjonalnie, po potwierdzeniu wkładu
 
 ## Cel i wkład naukowy
@@ -44,3 +44,7 @@ Zidentyfikowane braki, priorytety oraz kryteria akceptacji: [audyt z 2026-11-19]
 ## Własność i licencja
 
 Przed publikacją ustal autorstwo, instytucję, licencję kodu, prawne podstawy udostępniania materiałów i ewentualne licencje kwestionariuszy. Domyślny plik `LICENSE` **nie nadaje otwartej licencji**.
+
+## Zotero i bibliografia
+
+Zotero + Better BibTeX pozwala automatycznie eksportować odrębną kolekcję manuskryptu do `manuscripts/P01/references.bib`. CI sprawdza spójność cytowań lokalnie, bez konta i API. Konfiguracja: [docs/zotero.md](docs/zotero.md); komenda: `python scripts/check_zotero.py --root .`.

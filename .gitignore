@@ -29,3 +29,7 @@ site/
 build/
 dist/
 .DS_Store
+
+# Lokalna baza i rozszerzenia Zotero nie należą do repozytorium.
+zotero.sqlite*
+*.xpi

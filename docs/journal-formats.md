@@ -50,3 +50,7 @@ Wymagany jest rzeczywisty TeX Live/MiKTeX z odpowiednimi pakietami i BibTeX (je�
 Wszystkie rysunki TikZ tworzy się poza `main.tex`, w katalogu `manuscripts/P01/figures/`. **Jeden rysunek = jeden plik `.tex`** zawierający kod `tikzpicture`, podpis i etykietę. W pliku głównym umieszcza się wyłącznie np. `\input{figures/study-workflow.tex}`; deklaracje pakietów i bibliotek TikZ znajdują się w preambule. W kompilacji `latexmk` zachowuje się ścieżki względne względem katalogu manuskryptu.
 
 Do paczki redakcyjnej dla MDPI, Elsevier i Springer Nature dołączaj **wszystkie źródła rysunków**, bibliografię, niezbędne pliki pomocnicze oraz wymagane przez konkretne czasopismo osobne wersje ilustracji. Jeśli redakcja żąda TIFF/EPS/PDF, przygotuj zewnętrzną grafikę z zatwierdzonego źródła TikZ, a nie zastępuj nim źródła. Nie publikuj rysunków zawierających dane chronione ani hipotetycznych wyników jako wyników empirycznych.
+
+## Zotero i bibliografia
+
+Dla nowych manuskryptów preferowane jest Zotero + Better BibTeX z autoeksportem do wersjonowanego `references.bib`. Wybór klasy wydawcy zmienia styl cytowań, nie źródło metadanych. Nie przełączaj automatycznie BibTeX na Biber/BibLaTeX bez sprawdzenia szablonu konkretnego czasopisma. Instrukcje: [docs/zotero.md](zotero.md).
