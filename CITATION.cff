@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+message: "Cytuj wskazaną wersję publikacji i kodu; nie domniemaj istnienia DOI."
+type: software
+title: "REPLACE: Research Project Title"
+authors:
+  - family-names: "REPLACE"
+    given-names: "REPLACE"
+version: "0.1.0"

@@ -1,0 +1,39 @@
+# [Tytuł projektu badawczego]
+
+**Typ:** samodzielny projekt manuskryptowy `msc-*`  
+**Program:** `arc-neuro` / `arc-ai` / `arc-xr` / `arc-robo` (wybrać jeden główny)  
+**Status:** planowany; brak wyników empirycznych  
+**Wersja szablonu:** 1.0.0
+
+## Cel i wkład naukowy
+
+Opisz główne pytanie, wkład, populację/zestaw danych i ograniczenia. Nie traktuj tytułu roboczego ani planowanych wyników jako dowodu.
+
+## Rejestr publikacji
+
+| ID | Tytuł roboczy | Stan | Źródło |
+| --- | --- | --- | --- |
+| P01 | [Tytuł] | concept | [manuscripts/P01/README.md](manuscripts/P01/README.md) |
+
+## Badanie i reprodukowalność
+
+Protokół: [research/protocol.md](research/protocol.md). Plan analiz: [research/analysis-plan.md](research/analysis-plan.md). Etyka: [research/ethics.md](research/ethics.md). Dane: [research/data-management.md](research/data-management.md). Źródła dowodów: [research/evidence-register.csv](research/evidence-register.csv). Decyzje: [research/decisions.md](research/decisions.md). Aparatura: [equipment/README.md](equipment/README.md). Oprogramowanie: [software/dependencies.yaml](software/dependencies.yaml).
+
+Wersje kodu oraz zależności muszą być przypięte do SHA, tagu lub digestu; brak zwalidowanego pomiaru oznacz `NOT_VERIFIED`, nie `PASS`.
+
+## Otwarta nauka
+
+Strona projektu: **NOT_CONFIGURED**. Prerejestracja: **NOT_REGISTERED**. Preprint: **NOT_PUBLISHED**. Zbiór danych: **NOT_PUBLISHED**. Identyfikatory DOI i URL dodawać dopiero po ich potwierdzeniu. Publiczna strona MkDocs pochodzi wyłącznie z `docs/` i nie ujawnia danych uczestników.
+
+## Uruchamianie i jakość
+
+```bash
+python scripts/validate_repository.py --root . --phase scaffold
+python -m unittest discover -s tests -v
+# po uzupełnieniu materiałów gotowych do publikacji:
+python scripts/validate_repository.py --root . --phase publish
+```
+
+## Własność i licencja
+
+Przed publikacją ustal autorstwo, instytucję, licencję kodu, prawne podstawy udostępniania materiałów i ewentualne licencje kwestionariuszy. Domyślny plik `LICENSE` **nie nadaje otwartej licencji**.

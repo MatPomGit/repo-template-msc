@@ -1,0 +1,7 @@
+site_name: "REPLACE: Research project"
+site_description: "Publiczna dokumentacja projektu badawczego"
+docs_dir: docs
+site_dir: _site
+nav:
+  - O projekcie: index.md
+  - Dostęp do wyników: outputs.md

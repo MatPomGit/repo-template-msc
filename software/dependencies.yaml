@@ -1,0 +1,7 @@
+schema_version: 1
+# Przy analizie bieżącej weryfikuj remote HEAD; podczas reprodukcji trzymaj pinned_commit_sha.
+applications: []
+libraries: []
+submodules: []
+datasets: []
+analysis_environment: not_defined

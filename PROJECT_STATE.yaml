@@ -1,0 +1,28 @@
+schema_version: 1
+project_id: REPLACE_PROJECT_ID
+repository_type: manuscript
+programme: unassigned
+scientific_owner: REPLACE_OWNER
+updated: null
+research_phase: concept
+ethics_status: not_assessed
+preregistration_status: not_registered
+participant_data_status: not_collected
+pages_status: not_configured
+hardware_validation_status: not_run
+software_validation_status: not_run
+manuscript_root: manuscripts
+protocol_path: research/protocol.md
+analysis_plan_path: research/analysis-plan.md
+data_management_path: research/data-management.md
+evidence_register_path: research/evidence-register.csv
+software_manifest_path: software/dependencies.yaml
+publication_tracks:
+  - id: P01
+    path: manuscripts/P01
+    status: concept
+    doi: null
+    preprint: null
+known_blockers:
+  - confirm_research_question_and_ethical_route
+next_action: freeze_protocol_before_collection
