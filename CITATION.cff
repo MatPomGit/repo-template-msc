@@ -1,8 +1,9 @@
 cff-version: 1.2.0
-message: "Cytuj wskazaną wersję publikacji i kodu; nie domniemaj istnienia DOI."
+message: "..."
 type: software
 title: "REPLACE: Research Project Title"
 authors:
-  - family-names: "REPLACE"
-    given-names: "REPLACE"
+  - family-names: "Pomianek"
+    given-names: "Mateusz"
+    orcid: "https://orcid.org/0000-0001-7769-8919"
 version: "0.1.0"
