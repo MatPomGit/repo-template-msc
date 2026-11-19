@@ -14,3 +14,5 @@
 12. Po zmianach uruchom `python scripts/validate_repository.py --root . --phase scaffold`, zapisując SHA, zakres i faktyczny rezultat. `PASS` tylko po wykonanym teście.
 
 13. Wszystkie nowe manuskrypty naukowe rozpoczynaj domyślnie w LaTeX (`main.tex` + BibTeX). QMD/Markdown jest dopuszczalne tylko jako świadomie skonfigurowany wyjątek lub dla istniejących projektów. Nie twórz dwóch niezależnie rozwijanych źródeł tego samego artykułu. Dobór `mdpi`, `elsarticle` albo szablonu Springer Nature wymaga sprawdzenia aktualnych instrukcji konkretnego czasopisma. Zobacz `docs/journal-formats.md`.
+
+14. Wszystkie rysunki TikZ zapisuj jako osobne, wersjonowane pliki w `manuscripts/<ID>/figures/*.tex` i dołączaj z `main.tex` wyłącznie za pomocą `\\input{figures/nazwa.tex}`. Nie zapisuj `tikzpicture` ani `\\tikz{...}` w `main.tex`; skomplikowane makra rysunków też trzymaj poza plikiem głównym. Zachowaj podpisy, etykiety, źródło danych i prawa do figur. Upewnij się, że archiwum zgłoszenia zawiera wszystkie dołączane źródła.

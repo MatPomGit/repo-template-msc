@@ -8,3 +8,5 @@ Przed analizą bieżącego portfolio odczytaj najnowsze SHA repozytoriów powią
 ## Powtarzalność kompilacji LaTeX
 
 Dla manuskryptu przechowuj wersję TeX Live/MiKTeX, wybrany profil czasopisma, rzeczywisty SHA, bibliografię BibTeX, pliki `.sty`/`.cls` wymagane przez redakcję (jeśli można je legalnie dystrybuować), rysunki, log kompilacji i nieedytowane źródło `.tex`. PDF jest artefaktem pochodnym. QMD pozostaje wspierane wyłącznie po jawnym wyborze formatu i wskazaniu kanonicznego źródła.
+
+Źródła rysunków TikZ muszą być odrębnymi plikami `manuscripts/<ID>/figures/*.tex`. Do odtworzenia PDF nie wystarcza sam `main.tex`: archiwum zgłoszenia i proces walidacji muszą obejmować wszystkie pliki referencjonowane przez `\\input`. Każdy rysunek zawiera podpis, etykietę i opis źródła danych. Przy zmianie klasy wydawcy należy oddzielnie sprawdzić wymagany format grafiki (np. PDF, EPS, TIFF), ale nie usuwać kanonicznego źródła TikZ.

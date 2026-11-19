@@ -29,3 +29,7 @@ W przypadku istniejącej migracji `msc-mgr` nie należy kopiować atrapy P01 tyl
 ## LaTeX jako format kanoniczny (v1.1.0)
 
 Nowe `msc-*` otrzymują `manuscripts/P01/main.tex`, `references.bib`, `manuscript_format: latex` oraz jawne `manuscript_source`. Neutralny szablon `article` jest przeznaczony do pisania szkicu, a przed zgłoszeniem trzeba użyć właściwego szablonu czasopisma. Informacje o *Sensors*, *Information Fusion*, *New Ideas in Psychology*, *Journal of Biomedical Informatics*, *Scientific Reports* i *Future Internet* są w [docs/journal-formats.md](docs/journal-formats.md). QMD nie znika z walidatora: istniejące badania mogą pozostać w QMD bez zmian, pod warunkiem jawnej deklaracji `manuscript_format: quarto` i zgodnego `manuscript_source`. Przy zmianie formatu nie twórz automatycznie alternatywnego źródła artykułu bez uzgodnienia kanonicznej wersji.
+
+## Obowiązkowe wydzielenie TikZ
+
+Dla nowych manuskryptów LaTeX rysunki TikZ umieszczaj w `manuscripts/P01/figures/` (jeden rysunek w jednym pliku `.tex`). `main.tex` zawiera jedynie `\\input{figures/study-workflow.tex}`. Nie przenoś środowiska `tikzpicture` do dokumentu głównego. Zachowuj podpisy i identyfikatory `\\label`, uwzględnij pliki `figures/*.tex` w archiwum źródłowym i przygotuj dodatkowy format grafiki zgodnie z wymaganiami konkretnego czasopisma. Szablon zawiera wyłącznie schemat demonstracyjny, który należy zastąpić przed zgłoszeniem.

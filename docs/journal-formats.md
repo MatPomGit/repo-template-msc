@@ -44,3 +44,9 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 ```
 
 Wymagany jest rzeczywisty TeX Live/MiKTeX z odpowiednimi pakietami i BibTeX (jeśli używasz bibliografii). Zapisz wersje narzędzi, log i wynik kompilacji. Alternatywny Quarto pozostaje możliwy: `manuscript_format: quarto`, `manuscript_source: .../praca.qmd`. Kompilacja samego PDF bez źródeł nie stanowi kompletnego pakietu redakcyjnego.
+
+## Rysunki TikZ w plikach źródłowych
+
+Wszystkie rysunki TikZ tworzy się poza `main.tex`, w katalogu `manuscripts/P01/figures/`. **Jeden rysunek = jeden plik `.tex`** zawierający kod `tikzpicture`, podpis i etykietę. W pliku głównym umieszcza się wyłącznie np. `\\input{figures/study-workflow.tex}`; deklaracje pakietów i bibliotek TikZ znajdują się w preambule. W kompilacji `latexmk` zachowuje się ścieżki względne względem katalogu manuskryptu.
+
+Do paczki redakcyjnej dla MDPI, Elsevier i Springer Nature dołączaj **wszystkie źródła rysunków**, bibliografię, niezbędne pliki pomocnicze oraz wymagane przez konkretne czasopismo osobne wersje ilustracji. Jeśli redakcja żąda TIFF/EPS/PDF, przygotuj zewnętrzną grafikę z zatwierdzonego źródła TikZ, a nie zastępuj nim źródła. Nie publikuj rysunków zawierających dane chronione ani hipotetycznych wyników jako wyników empirycznych.

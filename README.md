@@ -10,7 +10,7 @@
 
 Opisz główne pytanie, wkład, populację/zestaw danych i ograniczenia. Nie traktuj tytułu roboczego ani planowanych wyników jako dowodu.
 
-**Kanoniczny format artykułów:** LaTeX (`manuscripts/P01/main.tex`, `references.bib`); QMD/Markdown tylko jako jawnie skonfigurowane alternatywy. Przed zgłoszeniem przełącz na oficjalny profil czasopisma. Zasady: [formaty redakcyjne](docs/journal-formats.md).
+**Kanoniczny format artykułów:** LaTeX (`manuscripts/P01/main.tex`, `references.bib`); QMD/Markdown tylko jako jawnie skonfigurowane alternatywy. Rysunki TikZ zapisuj w osobnych plikach `manuscripts/P01/figures/*.tex` i dołączaj przez `\\input{figures/nazwa.tex}`; nie umieszczaj środowisk `tikzpicture` w `main.tex`. Przed zgłoszeniem przełącz na oficjalny profil czasopisma. Zasady: [formaty redakcyjne](docs/journal-formats.md).
 
 ## Rejestr publikacji
 

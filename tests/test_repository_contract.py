@@ -98,6 +98,43 @@ class RepositoryContractTests(unittest.TestCase):
             state.write_text(data, encoding="utf-8")
             self.assertEqual(validator.validate(dest), [])
 
+    def test_tikz_is_an_external_figure(self):
+        main = (ROOT / "manuscripts/P01/main.tex").read_text(encoding="utf-8")
+        figure = ROOT / "manuscripts/P01/figures/study-workflow.tex"
+        self.assertIn(r"\\input{figures/study-workflow.tex}", main)
+        self.assertNotIn(r"\\begin{tikzpicture}", main)
+        self.assertTrue(figure.is_file())
+        self.assertIn(r"\\begin{tikzpicture}", figure.read_text(encoding="utf-8"))
+
+    def test_inline_tikz_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = Path(tmp) / "msc-test"
+            shutil.copytree(ROOT, dest, ignore=shutil.ignore_patterns("__pycache__"))
+            main = dest / "manuscripts/P01/main.tex"
+            main.write_text(main.read_text(encoding="utf-8") +
+                            "\\n" + r"\\begin{tikzpicture}\\end{tikzpicture}",
+                            encoding="utf-8")
+            self.assertTrue(any("Inline TikZ drawing" in issue
+                                for issue in validator.validate(dest)))
+
+    def test_missing_external_tikz_figure_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = Path(tmp) / "msc-test"
+            shutil.copytree(ROOT, dest, ignore=shutil.ignore_patterns("__pycache__"))
+            (dest / "manuscripts/P01/figures/study-workflow.tex").unlink()
+            self.assertTrue(any("Missing or unsafe external figure" in issue
+                                for issue in validator.validate(dest)))
+
+    def test_external_figure_cannot_be_a_standalone_document(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = Path(tmp) / "msc-test"
+            shutil.copytree(ROOT, dest, ignore=shutil.ignore_patterns("__pycache__"))
+            fig = dest / "manuscripts/P01/figures/study-workflow.tex"
+            fig.write_text(r"\\documentclass{standalone}" + "\\n" + fig.read_text(),
+                           encoding="utf-8")
+            self.assertTrue(any("input fragment" in issue
+                                for issue in validator.validate(dest)))
+
     def test_source_format_mismatch_fails(self):
         with tempfile.TemporaryDirectory() as tmp:
             dest = Path(tmp) / "msc-test"

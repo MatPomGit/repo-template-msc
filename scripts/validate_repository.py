@@ -69,6 +69,45 @@ def relative_file(root: Path, candidate: str | None) -> Path | None:
     return None
 
 
+
+def validate_latex_figures(source_file: Path, issues: list[str]) -> None:
+    """Check external TikZ files without executing TeX or running Git."""
+    try:
+        main = source_file.read_text(encoding="utf-8")
+    except (OSError, UnicodeError):
+        issues.append(f"Unreadable LaTeX source: {source_file.name}")
+        return
+
+    # Do not treat source comments as executable TikZ content.
+    live = "\n".join(re.split(r"(?<!\\)%", line, maxsplit=1)[0]
+                     for line in main.splitlines())
+    if re.search(r"\\begin\s*\{\s*tikzpicture\s*\}|\\tikz(?:set)?\b", live):
+        issues.append("Inline TikZ drawing in main.tex; put TikZ in figures/ and use \\input")
+
+    references = re.findall(r"\\(?:input|include)\s*\{\s*(figures/[^{}]+)\s*\}", live)
+    for ref in references:
+        rel = ref.strip()
+        parts = rel.split("/")
+        if (not rel.endswith(".tex")
+                or len(parts) < 2
+                or any(not re.fullmatch(r"[A-Za-z0-9_.-]+", part) or part in (".", "..")
+                       for part in parts)
+                or parts[0] != "figures"):
+            issues.append(f"Unsafe TikZ figure reference: {rel}")
+            continue
+        path = source_file.parent.joinpath(*parts)
+        if (path.is_symlink() or not path.is_file()
+                or not path.resolve().is_relative_to((source_file.parent / "figures").resolve())):
+            issues.append(f"Missing or unsafe external figure: {rel}")
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeError):
+            issues.append(f"Unreadable external figure: {rel}")
+            continue
+        if re.search(r"\\documentclass\b|\\begin\s*\{document\}", text):
+            issues.append(f"External figure must be an input fragment, not a standalone document: {rel}")
+
 def validate(root: Path, phase: str = "scaffold") -> list[str]:
     """Check required structure and conservative readiness boundaries."""
     issues: list[str] = []
@@ -109,6 +148,8 @@ def validate(root: Path, phase: str = "scaffold") -> list[str]:
                     or source_file.suffix not in (".qmd", ".tex", ".md")
                     or not source_file.relative_to(root).as_posix().startswith(manuscript_root + "/")):
                 issues.append(f"Missing or unsafe manuscript_source: {explicit_source}")
+            if source_format == "latex" and source_file is not None and source_file.is_file():
+                validate_latex_figures(source_file, issues)
             bibliography = state_scalar(state, "bibliography_path") or (manuscript_root + "/references.bib")
             bib = relative_file(root, bibliography)
             if bib is None or not bib.is_file():
