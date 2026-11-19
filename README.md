@@ -3,12 +3,14 @@
 **Typ:** samodzielny projekt manuskryptowy `msc-*`  
 **Program:** `arc-neuro` / `arc-ai` / `arc-xr` / `arc-robo` (wybrać jeden główny)  
 **Status:** planowany; brak wyników empirycznych  
-**Wersja szablonu:** 1.0.0  
+**Wersja szablonu:** 1.1.0  
 **Autor podstawowy:** Mateusz Pomianek (pozostaje w każdym projekcie); dodatkowi współautorzy: opcjonalnie, po potwierdzeniu wkładu
 
 ## Cel i wkład naukowy
 
 Opisz główne pytanie, wkład, populację/zestaw danych i ograniczenia. Nie traktuj tytułu roboczego ani planowanych wyników jako dowodu.
+
+**Kanoniczny format artykułów:** LaTeX (`manuscripts/P01/main.tex`, `references.bib`); QMD/Markdown tylko jako jawnie skonfigurowane alternatywy. Rysunki TikZ zapisuj w osobnych plikach `manuscripts/P01/figures/*.tex` i dołączaj przez `\input{figures/nazwa.tex}`; nie umieszczaj środowisk `tikzpicture` w `main.tex`. Przed zgłoszeniem przełącz na oficjalny profil czasopisma. Zasady: [formaty redakcyjne](docs/journal-formats.md).
 
 ## Rejestr publikacji
 
@@ -37,7 +39,7 @@ python scripts/validate_repository.py --root . --phase publish
 
 ## Audyt wzorca
 
-Zidentyfikowane braki, priorytety oraz kryteria akceptacji: [audyt z 2026-11-19](reviews/2026-11-19-template-audit.md). Publiczne repozytoria mogą używać GitHub-hosted runners do bezpiecznych kontroli CI; nie jest to jeszcze skonfigurowany workflow.
+Zidentyfikowane braki, priorytety oraz kryteria akceptacji: [audyt z 2026-11-19](reviews/2026-11-19-template-audit.md). Publiczne repozytoria korzystają z izolowanego, odczytowego workflow CI. Kompilacja pełnego LaTeX wymaga osobnego, zweryfikowanego środowiska.
 
 ## Własność i licencja
 
