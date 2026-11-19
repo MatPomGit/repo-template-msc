@@ -41,6 +41,7 @@ class RepositoryContractTests(unittest.TestCase):
             ).replace("\\n", "\n"))
             text = text.replace("protocol_path: research/protocol.md",
                                 "protocol_path: legacy/protokol.md")
+            text = text.replace("manuscript_format: latex", "manuscript_format: quarto")
             state.write_text(text, encoding="utf-8")
             (dest / "legacy/thesis").mkdir(parents=True)
             (dest / "legacy/thesis/praca.qmd").write_text("# Manuscript", encoding="utf-8")
