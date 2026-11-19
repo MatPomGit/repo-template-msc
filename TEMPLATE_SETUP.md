@@ -18,4 +18,10 @@ Mateusz Pomianek musi pozostać co najmniej jednym z autorów każdego projektu 
 
 ## Środowisko CI i koszty
 
-W repozytoriach **publicznych** dopuszczalne są GitHub-hosted runners (np. `ubuntu-latest`) do bezpiecznych testów i walidacji. Nie ma obowiązku używania runnerów lokalnych. W repozytoriach prywatnych dobierz runner zgodnie z uprawnieniami, poufnością i zasadą braku niezatwierdzonych kosztów. Nie przekazuj sekretów niezaufanym PR z forków ani nie uruchamiaj ich uprzywilejowanych zadań na maszynach z dostępem do prywatnych zasobów. Ustaw minimalne `GITHUB_TOKEN` permissions. Sam szablon nie ma jeszcze workflow CI: patrz [audyt i plan napraw](reviews/2026-11-19-template-audit.md).
+W repozytoriach **publicznych** dopuszczalne są GitHub-hosted runners (np. `ubuntu-latest`) do bezpiecznych testów i walidacji. Nie ma obowiązku używania runnerów lokalnych. W repozytoriach prywatnych dobierz runner zgodnie z uprawnieniami, poufnością i zasadą braku niezatwierdzonych kosztów. Nie przekazuj sekretów niezaufanym PR z forków ani nie uruchamiaj ich uprzywilejowanych zadań na maszynach z dostępem do prywatnych zasobów. Ustaw minimalne `GITHUB_TOKEN` permissions. Szablon ma podstawowe CI w `.github/workflows/msc-contract-tests.yml` uruchamiane tylko dla publicznych repozytoriów; patrz [audyt i plan napraw](reviews/2026-11-19-template-audit.md).
+
+## Migracja istniejących projektów bez zmiany ścieżek naukowych
+
+Obowiązkowe dokumenty pozostają wymagane, lecz `PROJECT_STATE.yaml` może wskazywać ich rzeczywiste ścieżki: `protocol_path`, `analysis_plan_path`, `ethics_path`, `data_management_path`, `preregistration_path`, `decisions_path`, `evidence_register_path`, `software_manifest_path`. Dla manuskryptu o niestandardowej nazwie ustaw `manuscript_root`, `manuscript_source` i opcjonalnie `bibliography_path`. Nazwa pliku może być `praca.qmd` lub `main.tex`. Nie stosować ścieżek absolutnych, `..` ani linków poza repozytorium. Dla nowego MSC pozostają domyślne pliki `manuscripts/P01`.
+
+W przypadku istniejącej migracji `msc-mgr` nie należy kopiować atrapy P01 tylko po to, aby zaliczyć test struktury. Braki dotyczące realnego protokołu, etyki, bibliografii lub prerejestracji pozostają błędami; naukowa gotowość wymaga niezależnej oceny.

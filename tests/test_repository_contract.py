@@ -2,6 +2,7 @@
 
 import importlib.util
 import shutil
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -26,6 +27,38 @@ class RepositoryContractTests(unittest.TestCase):
             shutil.copytree(ROOT, dest, ignore=shutil.ignore_patterns("__pycache__"))
             (dest / "research" / "protocol.md").unlink()
             self.assertTrue(any("research/protocol.md" in s for s in validator.validate(dest)))
+
+    def test_explicit_manuscript_and_protocol_mapping(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = Path(tmp) / "msc-test"
+            shutil.copytree(ROOT, dest, ignore=shutil.ignore_patterns("__pycache__"))
+            state = dest / "PROJECT_STATE.yaml"
+            text = state.read_text(encoding="utf-8")
+            text = text.replace("manuscript_root: manuscripts", (
+                "manuscript_root: legacy/thesis\\n"
+                "manuscript_source: legacy/thesis/praca.qmd\\n"
+                "bibliography_path: legacy/thesis/bibliografia.bib"
+            ).replace("\\n", "\n"))
+            text = text.replace("protocol_path: research/protocol.md",
+                                "protocol_path: legacy/protokol.md")
+            state.write_text(text, encoding="utf-8")
+            (dest / "legacy/thesis").mkdir(parents=True)
+            (dest / "legacy/thesis/praca.qmd").write_text("# Manuscript", encoding="utf-8")
+            (dest / "legacy/thesis/bibliografia.bib").write_text(
+                "@misc{example, title={Example}}", encoding="utf-8")
+            (dest / "legacy/protokol.md").write_text("Protocol", encoding="utf-8")
+            self.assertEqual(validator.validate(dest), [])
+
+    def test_path_traversal_in_scientific_manifest_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = Path(tmp) / "msc-test"
+            shutil.copytree(ROOT, dest, ignore=shutil.ignore_patterns("__pycache__"))
+            state = dest / "PROJECT_STATE.yaml"
+            state.write_text(state.read_text().replace(
+                "protocol_path: research/protocol.md", "protocol_path: ../outside.md"
+            ), encoding="utf-8")
+            self.assertTrue(any("Missing or unsafe required protocol_path" in x
+                                for x in validator.validate(dest)))
 
     def test_missing_manuscript_fails(self):
         with tempfile.TemporaryDirectory() as tmp:

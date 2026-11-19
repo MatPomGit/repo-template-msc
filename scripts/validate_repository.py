@@ -6,20 +6,14 @@ import argparse
 import csv
 import re
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 REQUIRED = (
     "README.md", "AGENTS.md", "ARCHITECTURE.md", "RESEARCH.md",
     "REPRODUCIBILITY.md", "PROJECT_STATE.yaml", "CITATION.cff",
     "LICENSE", "SECURITY.md", ".gitignore", ".gitattributes",
     "mkdocs.yml", "docs/index.md", "docs/outputs.md",
-    "research/protocol.md", "research/analysis-plan.md",
-    "research/ethics.md", "research/data-management.md",
-    "research/preregistration.md", "research/decisions.md",
-    "research/evidence-register.csv", "data/README.md",
-    "results/README.md", "equipment/README.md",
-    "software/dependencies.yaml", "manuscripts/P01/README.md",
-    "manuscripts/P01/references.bib",
+    "data/README.md", "results/README.md", "equipment/README.md",
     ".github/PULL_REQUEST_TEMPLATE.md",
     ".github/ISSUE_TEMPLATE/research-task.md",
 )
@@ -37,6 +31,44 @@ EVIDENCE_COLUMNS = (
 )
 
 
+# Every scientific obligation stays mandatory, even if a migrated project
+# uses different physical paths. These are only mapping defaults.
+DOCUMENTS = {
+    "protocol_path": "research/protocol.md",
+    "analysis_plan_path": "research/analysis-plan.md",
+    "ethics_path": "research/ethics.md",
+    "data_management_path": "research/data-management.md",
+    "preregistration_path": "research/preregistration.md",
+    "decisions_path": "research/decisions.md",
+    "evidence_register_path": "research/evidence-register.csv",
+    "software_manifest_path": "software/dependencies.yaml",
+}
+
+
+def state_scalar(text: str, key: str) -> str | None:
+    match = re.search(r"(?m)^" + re.escape(key) + r":\\s*([^\\r\\n#]*)", text)
+    if not match:
+        return None
+    return match.group(1).strip().strip("'\\\"")
+
+
+def relative_file(root: Path, candidate: str | None) -> Path | None:
+    if not isinstance(candidate, str) or not candidate or "\\\\" in candidate:
+        return None
+    path = PurePosixPath(candidate)
+    if path.is_absolute() or any(piece in (".", "..") for piece in candidate.split("/")):
+        return None
+    if not re.fullmatch(r"[A-Za-z0-9_./-]+", candidate):
+        return None
+    target = root.joinpath(*path.parts)
+    try:
+        if target.resolve().is_relative_to(root.resolve()) and not target.is_symlink():
+            return target
+    except (OSError, ValueError):
+        pass
+    return None
+
+
 def validate(root: Path, phase: str = "scaffold") -> list[str]:
     """Check required structure and conservative readiness boundaries."""
     issues: list[str] = []
@@ -51,21 +83,44 @@ def validate(root: Path, phase: str = "scaffold") -> list[str]:
         if not p.read_bytes().strip():
             issues.append(f"Empty required file: {relative}")
 
-    tracks = root / "manuscripts"
-    manuscripts = sorted(p for p in tracks.iterdir() if p.is_dir()) if tracks.is_dir() else []
-    if not manuscripts:
-        issues.append("Missing manuscripts/P01 or another manuscript directory")
-    for manuscript in manuscripts:
-        if not (manuscript / "README.md").is_file():
-            issues.append(f"Missing manuscript README: {manuscript.name}")
-        if not any((manuscript / ("main" + ext)).is_file() for ext in (".qmd", ".tex", ".md")):
-            issues.append(f"Missing main.qmd/main.tex/main.md: {manuscript.name}")
-        if not (manuscript / "references.bib").is_file():
-            issues.append(f"Missing references.bib: {manuscript.name}")
+    state_path = root / "PROJECT_STATE.yaml"
+    state = state_path.read_text(encoding="utf-8") if state_path.is_file() else ""
+    for key, default in DOCUMENTS.items():
+        relative = state_scalar(state, key) or default
+        target = relative_file(root, relative)
+        if target is None or not target.is_file() or target.stat().st_size == 0:
+            issues.append(f"Missing or unsafe required {key}: {relative}")
+
+    manuscript_root = state_scalar(state, "manuscript_root") or "manuscripts"
+    tracks = relative_file(root, manuscript_root)
+    if tracks is None or not tracks.is_dir():
+        issues.append(f"Missing or unsafe manuscript_root: {manuscript_root}")
+    else:
+        explicit_source = state_scalar(state, "manuscript_source")
+        if explicit_source:
+            source_file = relative_file(root, explicit_source)
+            if (source_file is None or not source_file.is_file()
+                    or source_file.suffix not in (".qmd", ".tex", ".md")
+                    or not source_file.relative_to(root).as_posix().startswith(manuscript_root + "/")):
+                issues.append(f"Missing or unsafe manuscript_source: {explicit_source}")
+            bibliography = state_scalar(state, "bibliography_path") or (manuscript_root + "/references.bib")
+            bib = relative_file(root, bibliography)
+            if bib is None or not bib.is_file():
+                issues.append(f"Missing bibliography: {bibliography}")
+        else:
+            manuscripts = sorted(p for p in tracks.iterdir() if p.is_dir() and not p.is_symlink())
+            if not manuscripts:
+                issues.append("Missing manuscripts/P01 or another manuscript directory")
+            for manuscript in manuscripts:
+                if not (manuscript / "README.md").is_file():
+                    issues.append(f"Missing manuscript README: {manuscript.name}")
+                if not any((manuscript / ("main" + ext)).is_file() for ext in (".qmd", ".tex", ".md")):
+                    issues.append(f"Missing main.qmd/main.tex/main.md: {manuscript.name}")
+                if not (manuscript / "references.bib").is_file():
+                    issues.append(f"Missing references.bib: {manuscript.name}")
 
     state_path = root / "PROJECT_STATE.yaml"
     if state_path.is_file():
-        state = state_path.read_text(encoding="utf-8")
         for key in REQUIRED_STATE_KEYS:
             if not re.search(r"(?m)^" + re.escape(key) + r":\s*", state):
                 issues.append(f"Missing PROJECT_STATE.yaml key: {key}")
@@ -76,8 +131,8 @@ def validate(root: Path, phase: str = "scaffold") -> list[str]:
                 issues.append("Unresolved project identity/owner")
             if re.search(r"(?m)^programme:\s*unassigned", state):
                 issues.append("Missing primary ARC programme")
-    ev = root / "research/evidence-register.csv"
-    if ev.is_file():
+    ev = relative_file(root, state_scalar(state, "evidence_register_path") or DOCUMENTS["evidence_register_path"])
+    if ev is not None and ev.is_file():
         with ev.open(encoding="utf-8", newline="") as handle:
             try:
                 hdr = next(csv.reader(handle))
