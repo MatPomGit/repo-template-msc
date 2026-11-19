@@ -18,7 +18,6 @@ manuscript_source: manuscripts/P01/main.tex
 bibliography_path: manuscripts/P01/references.bib
 bibliography_manager: zotero
 bibliography_exporter: better-bibtex
-bibliography_auto_export_status: not_configured
 journal_profile: generic-latex
 protocol_path: research/protocol.md
 analysis_plan_path: research/analysis-plan.md

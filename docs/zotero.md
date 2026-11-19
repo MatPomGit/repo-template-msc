@@ -7,7 +7,9 @@
 1. Zainstaluj [Zotero](https://www.zotero.org/) i rozszerzenie [Better BibTeX](https://retorque.re/zotero-better-bibtex/installation/).
 2. Utwórz osobną kolekcję dla artykułu P01. W Zotero wybierz **Export Collection…** i translator **Better BibTeX**. Nie wybieraj Better BibLaTeX dla domyślnego `natbib`/BibTeX.
 3. Zaznacz **Keep updated** i zapisz eksport do `manuscripts/P01/references.bib`. Wyłącz eksport notatek, załączników i adnotacji, a zawartość obejrzyj przed commitem. Początkowy plik z komentarzem jest placeholderem do zastąpienia.
-4. Sprawdź, czy eksport rzeczywiście aktualizuje plik po edycji kolekcji. Dopiero wtedy w `manuscripts/P01/zotero.json` ustaw `auto_export_status` na `configured`. To deklaracja użytkownika, nie atestacja synchronizacji.
+W ustawieniach Better BibTeX, w sekcji eksportu, ustaw **Fields to omit from export** na co najmniej `file,pdf,attachment,attachments,annote,annotation` (opcjonalnie również `note`, jeśli zawiera prywatne adnotacje). Samo wyłączenie kopiowania załączników nie gwarantuje pominięcia ścieżek w polach `.bib`; kontrola CI odrzuca takie pola. <https://retorque.re/zotero-better-bibtex/preferences/export/index.html>
+
+4. Sprawdź, czy eksport rzeczywiście aktualizuje plik po edycji kolekcji. Dopiero wtedy w `manuscripts/P01/zotero.json` ustaw `auto_export_status` na `configured`. To deklaracja użytkownika, nie atestacja synchronizacji; status ten występuje tylko w `zotero.json`, aby uniknąć rozbieżnych kopii konfiguracji.
 5. Wstawiaj w LaTeX `\citep{klucz}`, `\citet{klucz}` lub `\cite{klucz}`. Po użyciu rekordu przypnij jego citation key w Zotero. Nie edytuj ręcznie eksportu, bo ponowny eksport go nadpisze.
 6. Przed commitem uruchom `python scripts/check_zotero.py --root .`. Przed złożeniem: `python scripts/check_zotero.py --root . --require-setup` oraz kompilację PDF z BibTeX (np. `latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex` z katalogu manuskryptu).
 
