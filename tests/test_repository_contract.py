@@ -75,12 +75,45 @@ class RepositoryContractTests(unittest.TestCase):
             self.assertTrue(any("Missing or unsafe required protocol_path" in x
                                 for x in validator.validate(dest)))
 
+    def test_default_source_is_latex(self):
+        content = (ROOT / "PROJECT_STATE.yaml").read_text(encoding="utf-8")
+        self.assertIn("manuscript_format: latex", content)
+        self.assertIn("manuscript_source: manuscripts/P01/main.tex", content)
+        self.assertTrue((ROOT / "manuscripts/P01/main.tex").is_file())
+        self.assertFalse((ROOT / "manuscripts/P01/main.qmd").exists())
+
+    def test_quarto_remains_supported_on_explicit_opt_in(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = Path(tmp) / "msc-test"
+            shutil.copytree(ROOT, dest, ignore=shutil.ignore_patterns("__pycache__"))
+            source = dest / "manuscripts/P01/main.tex"
+            source.unlink()
+            (dest / "manuscripts/P01/main.qmd").write_text("# Draft", encoding="utf-8")
+            state = dest / "PROJECT_STATE.yaml"
+            data = state.read_text(encoding="utf-8")
+            data = data.replace("manuscript_format: latex", "manuscript_format: quarto")
+            data = data.replace("manuscript_source: manuscripts/P01/main.tex",
+                                "manuscript_source: manuscripts/P01/main.qmd")
+            state.write_text(data, encoding="utf-8")
+            self.assertEqual(validator.validate(dest), [])
+
+    def test_source_format_mismatch_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = Path(tmp) / "msc-test"
+            shutil.copytree(ROOT, dest, ignore=shutil.ignore_patterns("__pycache__"))
+            state = dest / "PROJECT_STATE.yaml"
+            state.write_text(state.read_text().replace(
+                "manuscript_format: latex", "manuscript_format: quarto"
+            ), encoding="utf-8")
+            self.assertTrue(any("manuscript_format conflicts" in x
+                                for x in validator.validate(dest)))
+
     def test_missing_manuscript_fails(self):
         with tempfile.TemporaryDirectory() as tmp:
             dest = Path(tmp) / "msc-test"
             shutil.copytree(ROOT, dest, ignore=shutil.ignore_patterns("__pycache__"))
-            (dest / "manuscripts" / "P01" / "main.qmd").unlink()
-            self.assertTrue(any("main.qmd" in s for s in validator.validate(dest)))
+            (dest / "manuscripts" / "P01" / "main.tex").unlink()
+            self.assertTrue(any("main.tex" in s for s in validator.validate(dest)))
 
 
 if __name__ == "__main__":

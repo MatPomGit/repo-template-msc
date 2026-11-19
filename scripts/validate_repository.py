@@ -97,6 +97,12 @@ def validate(root: Path, phase: str = "scaffold") -> list[str]:
         issues.append(f"Missing or unsafe manuscript_root: {manuscript_root}")
     else:
         explicit_source = state_scalar(state, "manuscript_source")
+        source_format = state_scalar(state, "manuscript_format")
+        expected_extensions = {"latex": ".tex", "quarto": ".qmd", "markdown": ".md"}
+        if source_format is not None and source_format not in expected_extensions:
+            issues.append(f"Unsupported manuscript_format: {source_format}")
+        if explicit_source and source_format in expected_extensions and not explicit_source.endswith(expected_extensions[source_format]):
+            issues.append("manuscript_format conflicts with manuscript_source")
         if explicit_source:
             source_file = relative_file(root, explicit_source)
             if (source_file is None or not source_file.is_file()

@@ -12,3 +12,5 @@
 10. GitHub Pages jest publiczną projekcją zawartości `docs/`, nie kopią prywatnego repo. Publikację zewnętrzną i duże wydatki poprzedza wymagane zatwierdzenie.
 11. Limit otwartych PR, reguły niezależnego przeglądu i zero dodatkowych wydatków są dziedziczone z aktualnej polityki Research Autopilot. Brak miejsca w WIP oznacza wstrzymanie nowego PR, nie obejście przez push do `main`.
 12. Po zmianach uruchom `python scripts/validate_repository.py --root . --phase scaffold`, zapisując SHA, zakres i faktyczny rezultat. `PASS` tylko po wykonanym teście.
+
+13. Wszystkie nowe manuskrypty naukowe rozpoczynaj domyślnie w LaTeX (`main.tex` + BibTeX). QMD/Markdown jest dopuszczalne tylko jako świadomie skonfigurowany wyjątek lub dla istniejących projektów. Nie twórz dwóch niezależnie rozwijanych źródeł tego samego artykułu. Dobór `mdpi`, `elsarticle` albo szablonu Springer Nature wymaga sprawdzenia aktualnych instrukcji konkretnego czasopisma. Zobacz `docs/journal-formats.md`.

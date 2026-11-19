@@ -14,7 +14,7 @@ Ten katalog stanowi kompletny, przenośny **szkielet repozytorium `msc-*`**. Prz
 
 ## Autorstwo i współautorstwo
 
-Mateusz Pomianek musi pozostać co najmniej jednym z autorów każdego projektu `msc-*` utworzonego z tego wzorca. Pozostali autorzy są opcjonalni: dopisuj ich po potwierdzeniu rzeczywistego wkładu, zgody, afiliacji i uzgodnieniu kolejności zgodnie z wymaganiami czasopisma. Nie kopiuj fikcyjnych danych współautorów. Spójność autorów sprawdzaj między `CITATION.cff` i `manuscripts/P*/main.qmd`.
+Mateusz Pomianek musi pozostać co najmniej jednym z autorów każdego projektu `msc-*` utworzonego z tego wzorca. Pozostali autorzy są opcjonalni: dopisuj ich po potwierdzeniu rzeczywistego wkładu, zgody, afiliacji i uzgodnieniu kolejności zgodnie z wymaganiami czasopisma. Nie kopiuj fikcyjnych danych współautorów. Spójność autorów sprawdzaj między `CITATION.cff` i domyślnym `manuscripts/P*/main.tex` lub zadeklarowanym alternatywnym źródłem.
 
 ## Środowisko CI i koszty
 
@@ -25,3 +25,7 @@ W repozytoriach **publicznych** dopuszczalne są GitHub-hosted runners (np. `ubu
 Obowiązkowe dokumenty pozostają wymagane, lecz `PROJECT_STATE.yaml` może wskazywać ich rzeczywiste ścieżki: `protocol_path`, `analysis_plan_path`, `ethics_path`, `data_management_path`, `preregistration_path`, `decisions_path`, `evidence_register_path`, `software_manifest_path`. Dla manuskryptu o niestandardowej nazwie ustaw `manuscript_root`, `manuscript_source` i opcjonalnie `bibliography_path`. Nazwa pliku może być `praca.qmd` lub `main.tex`. Nie stosować ścieżek absolutnych, `..` ani linków poza repozytorium. Dla nowego MSC pozostają domyślne pliki `manuscripts/P01`.
 
 W przypadku istniejącej migracji `msc-mgr` nie należy kopiować atrapy P01 tylko po to, aby zaliczyć test struktury. Braki dotyczące realnego protokołu, etyki, bibliografii lub prerejestracji pozostają błędami; naukowa gotowość wymaga niezależnej oceny.
+
+## LaTeX jako format kanoniczny (v1.1.0)
+
+Nowe `msc-*` otrzymują `manuscripts/P01/main.tex`, `references.bib`, `manuscript_format: latex` oraz jawne `manuscript_source`. Neutralny szablon `article` jest przeznaczony do pisania szkicu, a przed zgłoszeniem trzeba użyć właściwego szablonu czasopisma. Informacje o *Sensors*, *Information Fusion*, *New Ideas in Psychology*, *Journal of Biomedical Informatics*, *Scientific Reports* i *Future Internet* są w [docs/journal-formats.md](docs/journal-formats.md). QMD nie znika z walidatora: istniejące badania mogą pozostać w QMD bez zmian, pod warunkiem jawnej deklaracji `manuscript_format: quarto` i zgodnego `manuscript_source`. Przy zmianie formatu nie twórz automatycznie alternatywnego źródła artykułu bez uzgodnienia kanonicznej wersji.
