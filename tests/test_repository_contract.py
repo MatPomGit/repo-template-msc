@@ -47,7 +47,22 @@ class RepositoryContractTests(unittest.TestCase):
             (dest / "legacy/thesis/bibliografia.bib").write_text(
                 "@misc{example, title={Example}}", encoding="utf-8")
             (dest / "legacy/protokol.md").write_text("Protocol", encoding="utf-8")
+            # Remove the original defaults; this would fail if metadata paths
+            # were silently ignored by a broken parser.
+            (dest / "research/protocol.md").unlink()
+            shutil.rmtree(dest / "manuscripts")
             self.assertEqual(validator.validate(dest), [])
+
+    def test_missing_mapped_protocol_must_fail(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = Path(tmp) / "msc-test"
+            shutil.copytree(ROOT, dest, ignore=shutil.ignore_patterns("__pycache__"))
+            state = dest / "PROJECT_STATE.yaml"
+            state.write_text(state.read_text().replace(
+                "protocol_path: research/protocol.md", "protocol_path: other/missing.md"
+            ), encoding="utf-8")
+            self.assertTrue(any("Missing or unsafe required protocol_path" in x
+                                for x in validator.validate(dest)))
 
     def test_path_traversal_in_scientific_manifest_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:

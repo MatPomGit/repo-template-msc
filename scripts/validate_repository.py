@@ -46,14 +46,14 @@ DOCUMENTS = {
 
 
 def state_scalar(text: str, key: str) -> str | None:
-    match = re.search(r"(?m)^" + re.escape(key) + r":\\s*([^\\r\\n#]*)", text)
+    match = re.search(r"(?m)^" + re.escape(key) + r":\s*([^\r\n#]*)", text)
     if not match:
         return None
     return match.group(1).strip().strip("'\\\"")
 
 
 def relative_file(root: Path, candidate: str | None) -> Path | None:
-    if not isinstance(candidate, str) or not candidate or "\\\\" in candidate:
+    if not isinstance(candidate, str) or not candidate or chr(92) in candidate:
         return None
     path = PurePosixPath(candidate)
     if path.is_absolute() or any(piece in (".", "..") for piece in candidate.split("/")):
