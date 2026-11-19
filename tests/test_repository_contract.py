@@ -101,10 +101,10 @@ class RepositoryContractTests(unittest.TestCase):
     def test_tikz_is_an_external_figure(self):
         main = (ROOT / "manuscripts/P01/main.tex").read_text(encoding="utf-8")
         figure = ROOT / "manuscripts/P01/figures/study-workflow.tex"
-        self.assertIn(r"\\input{figures/study-workflow.tex}", main)
-        self.assertNotIn(r"\\begin{tikzpicture}", main)
+        self.assertIn(r"\input{figures/study-workflow.tex}", main)
+        self.assertNotIn(r"\begin{tikzpicture}", main)
         self.assertTrue(figure.is_file())
-        self.assertIn(r"\\begin{tikzpicture}", figure.read_text(encoding="utf-8"))
+        self.assertIn(r"\begin{tikzpicture}", figure.read_text(encoding="utf-8"))
 
     def test_inline_tikz_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -112,7 +112,7 @@ class RepositoryContractTests(unittest.TestCase):
             shutil.copytree(ROOT, dest, ignore=shutil.ignore_patterns("__pycache__"))
             main = dest / "manuscripts/P01/main.tex"
             main.write_text(main.read_text(encoding="utf-8") +
-                            "\\n" + r"\\begin{tikzpicture}\\end{tikzpicture}",
+                            "\\n" + r"\begin{tikzpicture}\\end{tikzpicture}",
                             encoding="utf-8")
             self.assertTrue(any("Inline TikZ drawing" in issue
                                 for issue in validator.validate(dest)))
@@ -130,7 +130,7 @@ class RepositoryContractTests(unittest.TestCase):
             dest = Path(tmp) / "msc-test"
             shutil.copytree(ROOT, dest, ignore=shutil.ignore_patterns("__pycache__"))
             fig = dest / "manuscripts/P01/figures/study-workflow.tex"
-            fig.write_text(r"\\documentclass{standalone}" + "\\n" + fig.read_text(),
+            fig.write_text(r"\documentclass{standalone}" + "\\n" + fig.read_text(),
                            encoding="utf-8")
             self.assertTrue(any("input fragment" in issue
                                 for issue in validator.validate(dest)))

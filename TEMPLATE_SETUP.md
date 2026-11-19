@@ -32,4 +32,4 @@ Nowe `msc-*` otrzymują `manuscripts/P01/main.tex`, `references.bib`, `manuscrip
 
 ## Obowiązkowe wydzielenie TikZ
 
-Dla nowych manuskryptów LaTeX rysunki TikZ umieszczaj w `manuscripts/P01/figures/` (jeden rysunek w jednym pliku `.tex`). `main.tex` zawiera jedynie `\\input{figures/study-workflow.tex}`. Nie przenoś środowiska `tikzpicture` do dokumentu głównego. Zachowuj podpisy i identyfikatory `\\label`, uwzględnij pliki `figures/*.tex` w archiwum źródłowym i przygotuj dodatkowy format grafiki zgodnie z wymaganiami konkretnego czasopisma. Szablon zawiera wyłącznie schemat demonstracyjny, który należy zastąpić przed zgłoszeniem.
+Dla nowych manuskryptów LaTeX rysunki TikZ umieszczaj w `manuscripts/P01/figures/` (jeden rysunek w jednym pliku `.tex`). `main.tex` zawiera jedynie `\input{figures/study-workflow.tex}`. Nie przenoś środowiska `tikzpicture` do dokumentu głównego. Zachowuj podpisy i identyfikatory `\label`, uwzględnij pliki `figures/*.tex` w archiwum źródłowym i przygotuj dodatkowy format grafiki zgodnie z wymaganiami konkretnego czasopisma. Szablon zawiera wyłącznie schemat demonstracyjny, który należy zastąpić przed zgłoszeniem.

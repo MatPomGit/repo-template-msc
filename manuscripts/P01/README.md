@@ -8,4 +8,4 @@
 
 ## Rysunki
 
-Rysunki TikZ znajdują się wyłącznie w [figures/](figures/README.md). W `main.tex` umieszczaj jedynie odwołania, np. `\\input{figures/study-workflow.tex}`. Każdy rysunek ma osobny podpis i etykietę; przykład jest schematem demonstracyjnym, nie wynikiem empirycznym.
+Rysunki TikZ znajdują się wyłącznie w [figures/](figures/README.md). W `main.tex` umieszczaj jedynie odwołania, np. `\input{figures/study-workflow.tex}`. Każdy rysunek ma osobny podpis i etykietę; przykład jest schematem demonstracyjnym, nie wynikiem empirycznym.
