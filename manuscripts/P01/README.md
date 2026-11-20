@@ -9,3 +9,7 @@
 ## Rysunki
 
 Rysunki TikZ znajdują się wyłącznie w [figures/](figures/README.md). W `main.tex` umieszczaj jedynie odwołania, np. `\input{figures/study-workflow.tex}`. Każdy rysunek ma osobny podpis i etykietę; przykład jest schematem demonstracyjnym, nie wynikiem empirycznym.
+
+## Zotero
+
+Bibliografia `references.bib` jest przygotowana do autoeksportu z Zotero/Better BibTeX. Plik [zotero.json](zotero.json) zawiera tylko niesekretne ustawienia, a [instrukcja](../../docs/zotero.md) opisuje konfigurację `Keep updated`. Eksport wymaga lokalnej instalacji Zotero i nie jest jeszcze aktywny w szablonie. Nie edytuj generowanego pliku `.bib` ręcznie.

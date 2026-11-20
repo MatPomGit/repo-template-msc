@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "manager": "zotero",
+  "exporter": "Better BibTeX",
+  "bibliography": "references.bib",
+  "auto_export_status": "not_configured",
+  "keep_updated_required": true,
+  "export_notes": false,
+  "export_attachments": false,
+  "export_annotations": false
+}
