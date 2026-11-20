@@ -40,7 +40,7 @@ Stosuj responsywny układ, prawidłową hierarchię nagłówków, kontrast, klaw
 ## 5. Walidacja i publikacja
 
 1. Sprawdź exact SHA, status badania, prawa do tekstów i ilustracji, etykę oraz zakres zgody na ujawnienie wyników. Ustal docelową domenę i widoczność witryny, również dla repo prywatnego.
-2. Wykonaj `python scripts/validate_pages.py`, `python scripts/validate_documentation.py`, `python -m mkdocs build --strict` oraz `python scripts/validate_site.py --strict`. Pierwszy walidator kontroluje źródła; drugi weryfikuje cały wygenerowany katalog `_site/`, w tym skrypty i przypięte zasoby motywu. Nie jest to publikacja.
+2. Wykonaj `python scripts/validate_pages.py`, `python scripts/validate_documentation.py`, `python -m mkdocs build --strict` oraz `python scripts/validate_site.py --strict`. Pierwszy walidator kontroluje źródła; drugi weryfikuje cały wygenerowany katalog `_site/`, w tym skrypty i przypięte zasoby motywu. Sprawdzane są również 24 zatwierdzone sumy SHA-256 plików motywu, aktywny HTML i zasoby zewnętrzne; domyślny `highlight.js` z CDN jest wyłączony. Nie jest to publikacja.
 3. Przejrzyj faktyczny render i wszystkie pliki wynikowe, PDF, obrazy, metadane, linki, indeks wyszukiwania, dostępność i brak treści instruktażowych dla agentów. Kontrola statyczna nie gwarantuje ochrony przed każdym wyciekiem.
 4. Uzyskaj niezależną recenzję na finalnym SHA i **osobną decyzję właściciela** dla zawartości, domeny i widoczności. Brak obowiązkowego CI/review w rulesecie gałęzi oznacza `GATE_UNENFORCED`, nie zatwierdzenie.
 5. Po świadomym wdrożeniu zweryfikuj rzeczywistą witrynę oraz możliwość wycofania. W razie ujawnienia danych zatrzymaj publikację i zastosuj [procedurę incydentową](security/incident-response.md). Kopie cache mogą pozostać dostępne.

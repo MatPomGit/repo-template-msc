@@ -2,5 +2,8 @@
 site_name: "Projekt badawczy"
 docs_dir: pages
 site_dir: _site
+theme:
+  name: mkdocs
+  highlightjs: false
 nav:
   - O projekcie: index.md

@@ -19,10 +19,20 @@ jobs:
       - name: Checkout isolated PR
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
           fetch-depth: 1
           submodules: false
           lfs: false
+      - name: Assert exact PR SHA
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          actual_sha="$(git rev-parse HEAD)"
+          echo "MSC HEAD: $actual_sha"
+          test "$actual_sha" = "$EXPECTED_SHA"
       - name: Validate MSC structure
         run: python3 -B scripts/validate_repository.py --root . --phase scaffold
       - name: Check documentation budgets
@@ -33,3 +43,11 @@ jobs:
         run: python3 -B scripts/check_zotero.py --root .
       - name: Run offline unit tests
         run: python3 -B -m unittest discover -s tests -v
+      - name: Build public Pages with pinned MkDocs, no deployment
+        run: |
+          set -euo pipefail
+          python3 -m venv /tmp/msc-mkdocs
+          /tmp/msc-mkdocs/bin/pip install --disable-pip-version-check --no-input 'mkdocs==1.6.1'
+          /tmp/msc-mkdocs/bin/mkdocs build --strict
+      - name: Audit every rendered public Pages asset
+        run: python3 -B scripts/validate_site.py --strict
