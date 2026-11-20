@@ -16,6 +16,8 @@ Kanoniczne źródła prawdy są rozdzielone: [README](../README.md) opisuje proj
 | Strony publiczne w `pages/` | 6 000 |
 | `research/protocol.md`, `research/analysis-plan.md` | 12 000 |
 
+Ścieżki protokołu, SAP, etyki i dokumentów naukowych mogą być mapowane z `PROJECT_STATE.yaml`: limit podąża za aktualnym plikiem, a nie zmusza do zachowania pierwotnej nazwy. Nie uznawaj starego placeholdera za dokument kanoniczny.
+
 **Manuskrypty `.tex`, `.qmd`, bibliografie `.bib`, dane i wyniki nie podlegają tym limitom redakcyjnym.** Nie skracaj opisu metod ani dowodów dla spełnienia budżetu dokumentacji administracyjnej. W długim protokole utwórz jeden właściwy odrębny aneks i powiąż go z protokołem, zamiast usuwać uzasadnienia etyczne lub powtarzalne szczegóły. Zmiana limitów wymaga uzasadnienia i testów w PR.
 
 ## Fazy aktualizacji

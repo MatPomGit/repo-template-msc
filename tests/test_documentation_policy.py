@@ -83,6 +83,31 @@ class DocumentationTests(unittest.TestCase):
             self.assertIn("DOC POLICY: invalid limit or path ../private.md",
                           validator.check_documentation(root))
 
+    def test_scientific_documents_follow_project_state_mapping(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self.fixture(Path(tmp) / "msc")
+            state = root / "PROJECT_STATE.yaml"
+            state.write_text(state.read_text().replace(
+                "protocol_path: research/protocol.md",
+                "protocol_path: legacy/protokol.md"), encoding="utf-8")
+            (root / "legacy").mkdir(exist_ok=True)
+            (root / "legacy/protokol.md").write_text("Protokół migracji", encoding="utf-8")
+            (root / "research/protocol.md").unlink()
+            self.assertEqual([], validator.check_documentation(root))
+
+    def test_migrated_protocol_limit_is_enforced(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self.fixture(Path(tmp) / "msc")
+            state = root / "PROJECT_STATE.yaml"
+            state.write_text(state.read_text().replace(
+                "protocol_path: research/protocol.md",
+                "protocol_path: legacy/protokol.md"), encoding="utf-8")
+            (root / "legacy").mkdir(exist_ok=True)
+            (root / "legacy/protokol.md").write_text("x" * 12001, encoding="utf-8")
+            (root / "research/protocol.md").unlink()
+            self.assertTrue(any("DOC LENGTH EXCEEDED: legacy/protokol.md" in e
+                                for e in validator.check_documentation(root)))
+
 
 if __name__ == "__main__":
     unittest.main()
