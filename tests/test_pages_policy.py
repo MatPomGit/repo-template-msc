@@ -123,6 +123,38 @@ class PagesPolicyTests(unittest.TestCase):
             self.assertIn("PAGES EDITORIAL OR AGENT CONTENT: index.md",
                           pages.check_pages(root))
 
+    def test_public_pdf_requires_matching_sha256(self):
+        import hashlib
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self.fixture(Path(tmp) / "msc")
+            file = root / "pages/manuscript-p01.pdf"
+            file.write_bytes(b"%PDF-1.7\n1 0 obj\n<<>>\nendobj\n%%EOF")
+            policy = root / "config/pages-policy.json"
+            data = json.loads(policy.read_text(encoding="utf-8"))
+            data["public_files"].append("manuscript-p01.pdf")
+            policy.write_text(json.dumps(data), encoding="utf-8")
+            self.assertIn("PAGES PDF HASH UNAPPROVED: manuscript-p01.pdf",
+                          pages.check_pages(root))
+            data["approved_pdf_sha256"]["manuscript-p01.pdf"] = hashlib.sha256(
+                file.read_bytes()).hexdigest()
+            policy.write_text(json.dumps(data), encoding="utf-8")
+            self.assertEqual([], pages.check_pages(root))
+
+    def test_active_public_pdf_rejected(self):
+        import hashlib
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self.fixture(Path(tmp) / "msc")
+            file = root / "pages/manuscript-p01.pdf"
+            file.write_bytes(b"%PDF-1.7\n/OpenAction << /JavaScript >>\n%%EOF")
+            policy = root / "config/pages-policy.json"
+            data = json.loads(policy.read_text(encoding="utf-8"))
+            data["public_files"].append("manuscript-p01.pdf")
+            data["approved_pdf_sha256"]["manuscript-p01.pdf"] = hashlib.sha256(
+                file.read_bytes()).hexdigest()
+            policy.write_text(json.dumps(data), encoding="utf-8")
+            self.assertIn("PAGES PDF ACTIVE CONTENT: manuscript-p01.pdf",
+                          pages.check_pages(root))
+
     def test_symlink_to_private_file_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = self.fixture(Path(tmp) / "msc")

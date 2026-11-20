@@ -16,7 +16,7 @@ from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 ALLOWED_EXT = {".md", ".html", ".css", ".js", ".svg", ".png", ".jpg",
-               ".jpeg", ".webp", ".avif", ".ico"}
+               ".jpeg", ".webp", ".avif", ".ico", ".pdf"}
 TEXT_EXT = {".md", ".html", ".css", ".js", ".svg"}
 IMAGE_EXT = {".png", ".jpg", ".jpeg", ".webp", ".avif", ".ico"}
 UNSAFE_SEGMENTS = {"docs", "research", "manuscripts", "software",
@@ -209,15 +209,21 @@ def check_pages(root: Path = ROOT) -> list[str]:
         errors.append("PAGES POLICY: duplicate or missing index")
     approved_theme = data.get("approved_theme_assets")
     approved_images = data.get("approved_image_sha256")
+    approved_pdfs = data.get("approved_pdf_sha256")
     if (not isinstance(approved_theme, dict) or not approved_theme or
             not isinstance(approved_images, dict) or
+            not isinstance(approved_pdfs, dict) or
             any(not isinstance(k, str) or not isinstance(v, str) or
                 not re.fullmatch(r"[0-9a-f]{64}", v)
                 for k, v in approved_theme.items()) or
             any(not isinstance(k, str) or k not in allowed or
                 PurePosixPath(k).suffix.lower() not in IMAGE_EXT or
                 not isinstance(v, str) or not re.fullmatch(r"[0-9a-f]{64}", v)
-                for k, v in approved_images.items())):
+                for k, v in approved_images.items()) or
+            any(not isinstance(k, str) or k not in allowed or
+                PurePosixPath(k).suffix.lower() != ".pdf" or
+                not isinstance(v, str) or not re.fullmatch(r"[0-9a-f]{64}", v)
+                for k, v in approved_pdfs.items())):
         return sorted(set(errors + ["PAGES POLICY: invalid approved asset hashes"]))
     try:
         config = (root / "mkdocs.yml").read_text(encoding="utf-8")
@@ -248,9 +254,20 @@ def check_pages(root: Path = ROOT) -> list[str]:
             if not file.resolve(strict=True).is_relative_to(folder):
                 errors.append("PAGES OUTSIDE SOURCE: " + rel)
                 continue
-            if file.stat().st_size > 2_000_000:
+            max_size = 15_000_000 if file.suffix.lower() == ".pdf" else 2_000_000
+            if file.stat().st_size > max_size:
                 errors.append("PAGES TOO LARGE: " + rel)
                 continue
+            if file.suffix.lower() == ".pdf":
+                pdf = file.read_bytes()
+                if hashlib.sha256(pdf).hexdigest() != approved_pdfs.get(rel):
+                    errors.append("PAGES PDF HASH UNAPPROVED: " + rel)
+                if not pdf.startswith(b"%PDF-") or b"%%EOF" not in pdf[-2048:]:
+                    errors.append("PAGES PDF INVALID: " + rel)
+                if any(marker in pdf for marker in
+                       (b"/JavaScript", b"/OpenAction", b"/Launch", b"/EmbeddedFile",
+                        b"/RichMedia", b"/FileAttachment")):
+                    errors.append("PAGES PDF ACTIVE CONTENT: " + rel)
             if file.suffix.lower() in IMAGE_EXT:
                 body = file.read_bytes()
                 if hashlib.sha256(body).hexdigest() != approved_images.get(rel):

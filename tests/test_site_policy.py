@@ -84,5 +84,37 @@ class SiteTests(unittest.TestCase):
                 '<form><input id="mkdocs-search-query" type="search"></form>', encoding="utf-8")
             self.assertEqual([], check_site(site))
 
+    def test_public_pdf_tamper_rejected(self):
+        import hashlib
+        import json
+        import shutil
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            (folder / "config").mkdir()
+            original = json.loads((ROOT / "config/pages-policy.json").read_text(encoding="utf-8"))
+            pdf = b"%PDF-1.7\n1 0 obj\n<<>>\nendobj\n%%EOF"
+            original["public_files"].append("manuscript-p01.pdf")
+            original["approved_pdf_sha256"]["manuscript-p01.pdf"] = hashlib.sha256(pdf).hexdigest()
+            (folder / "config/pages-policy.json").write_text(json.dumps(original), encoding="utf-8")
+            site = self.site(tmp)
+            (site / "manuscript-p01.pdf").write_bytes(pdf + b"tampered")
+            self.assertIn("SITE PDF HASH MISMATCH: manuscript-p01.pdf",
+                          check_site(site, root=folder))
+
+    def test_public_pdf_sha_validates_when_matching(self):
+        import hashlib
+        import json
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            (folder / "config").mkdir()
+            original = json.loads((ROOT / "config/pages-policy.json").read_text(encoding="utf-8"))
+            pdf = b"%PDF-1.7\n1 0 obj\n<<>>\nendobj\n%%EOF"
+            original["public_files"].append("manuscript-p01.pdf")
+            original["approved_pdf_sha256"]["manuscript-p01.pdf"] = hashlib.sha256(pdf).hexdigest()
+            (folder / "config/pages-policy.json").write_text(json.dumps(original), encoding="utf-8")
+            site = self.site(tmp)
+            (site / "manuscript-p01.pdf").write_bytes(pdf)
+            self.assertEqual([], check_site(site, root=folder))
+
 if __name__=="__main__":
     unittest.main()

@@ -114,13 +114,17 @@ def read_policy(root: Path) -> tuple[dict, list[str]]:
             return {}, ["SITE POLICY: source and build directories must be isolated"]
         theme = data["approved_theme_assets"]
         images = data["approved_image_sha256"]
+        pdfs = data["approved_pdf_sha256"]
         files = data["public_files"]
         if (type(data.get("schema_version")) is not int or data["schema_version"] != 1
                 or not isinstance(theme, dict) or not theme
-                or not isinstance(images, dict) or not isinstance(files, list)
+                or not isinstance(images, dict) or not isinstance(pdfs, dict)
+                or not isinstance(files, list)
                 or any(not isinstance(k, str) or not isinstance(v, str) or
-                       not HASH_RE.fullmatch(v) for k, v in [*theme.items(), *images.items()])
-                or any(name not in files for name in images)):
+                       not HASH_RE.fullmatch(v) for k, v in [*theme.items(), *images.items(), *pdfs.items()])
+                or any(name not in files for name in images)
+                or any(name not in files or PurePosixPath(name).suffix.lower() != ".pdf"
+                       for name in pdfs)):
             return {}, ["SITE POLICY: invalid approved assets"]
         return data, []
     except (OSError, ValueError, TypeError, KeyError, UnicodeError, AttributeError):
@@ -137,6 +141,7 @@ def check_site(site: Path, *, strict: bool = False, root: Path = ROOT) -> list[s
     approved = policy["public_files"]
     theme = policy["approved_theme_assets"]
     images = policy["approved_image_sha256"]
+    pdfs = policy["approved_pdf_sha256"]
     approved_html = expected_html(approved)
     approved_sources = {x for x in approved if PurePosixPath(x).suffix != ".md"}
     scripts = {x for x in theme if x.endswith(".js")} | {
@@ -166,6 +171,16 @@ def check_site(site: Path, *, strict: bool = False, root: Path = ROOT) -> list[s
             issues.append("SITE THEME HASH MISMATCH: " + name)
         if name in images and hashlib.sha256(file.read_bytes()).hexdigest() != images[name]:
             issues.append("SITE IMAGE HASH MISMATCH: " + name)
+        if name in pdfs:
+            body = file.read_bytes()
+            if hashlib.sha256(body).hexdigest() != pdfs[name]:
+                issues.append("SITE PDF HASH MISMATCH: " + name)
+            if not body.startswith(b"%PDF-") or b"%%EOF" not in body[-2048:]:
+                issues.append("SITE PDF INVALID: " + name)
+            if any(mark in body for mark in
+                   (b"/JavaScript", b"/OpenAction", b"/Launch", b"/EmbeddedFile",
+                    b"/RichMedia", b"/FileAttachment")):
+                issues.append("SITE PDF ACTIVE CONTENT: " + name)
         if file.suffix.lower() == ".html":
             count += 1
             try:

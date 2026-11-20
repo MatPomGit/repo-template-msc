@@ -33,5 +33,6 @@
     "webfonts/fa-v4compatibility.ttf": "09663a36fc05e7190af8324b855105c5bb511ad94f94b81b34afee503279eca2",
     "webfonts/fa-v4compatibility.woff2": "4d4a2d7fd1c6684845cb174fdd7fc073bd64cb741286fb247f8b76c2b7b852c4"
   },
-  "approved_image_sha256": {}
+  "approved_image_sha256": {},
+  "approved_pdf_sha256": {}
 }
