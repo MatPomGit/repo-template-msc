@@ -26,12 +26,18 @@ Wersje kodu oraz zależności muszą być przypięte do SHA, tagu lub digestu; b
 
 ## Otwarta nauka
 
-Strona projektu: **NOT_CONFIGURED**. Prerejestracja: **NOT_REGISTERED**. Preprint: **NOT_PUBLISHED**. Zbiór danych: **NOT_PUBLISHED**. Identyfikatory DOI i URL dodawać dopiero po ich potwierdzeniu. Publiczna strona MkDocs pochodzi wyłącznie z `docs/` i nie ujawnia danych uczestników.
+Strona projektu: **NOT_CONFIGURED**. Prerejestracja: **NOT_REGISTERED**. Preprint: **NOT_PUBLISHED**. Zbiór danych: **NOT_PUBLISHED**. Identyfikatory DOI i URL dodawać dopiero po ich potwierdzeniu. Publiczna strona MkDocs korzysta wyłącznie z odrębnego `pages/` i jawnej listy plików dopuszczonych do publikacji. Wewnętrzne `docs/` nigdy nie są źródłem witryny. Publikacja wymaga osobnego zatwierdzenia, szczególnie dla prywatnych repozytoriów.
+
+## Architektura, bezpieczeństwo i dokumentacja
+
+[Architektura projektu](ARCHITECTURE.md), [ADR](docs/adr/README.md), [ryzyka bezpieczeństwa](docs/security/threat-model.md), [zasady ochrony danych](SECURITY.md), [zarządzanie](GOVERNANCE.md), [standard dokumentacji](docs/documentation.md) i [polityka Pages](docs/pages.md). Materiały dla agentów pozostają poza witryną.
 
 ## Uruchamianie i jakość
 
 ```bash
 python scripts/validate_repository.py --root . --phase scaffold
+python scripts/validate_documentation.py
+python scripts/validate_pages.py
 python -m unittest discover -s tests -v
 # po uzupełnieniu materiałów gotowych do publikacji:
 python scripts/validate_repository.py --root . --phase publish
