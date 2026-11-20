@@ -45,3 +45,9 @@ Dla nowych manuskryptów LaTeX rysunki TikZ umieszczaj w `manuscripts/P01/figure
 ## Zotero / Better BibTeX
 
 Dla każdego manuskryptu utwórz lokalnie kolekcję Zotero i ustaw automatyczny eksport translatora Better BibTeX z opcją **Keep updated** do odpowiedniego `references.bib`. Nie eksportuj notatek, adnotacji ani załączników. Po prawdziwej konfiguracji zmień status w `zotero.json` na `configured`. Do pierwszego zgłoszenia użyj `python scripts/check_zotero.py --root . --require-setup`; CI korzysta z odczytowego trybu offline. Instrukcje: [docs/zotero.md](docs/zotero.md).
+
+## Publiczna witryna i wydania naukowe MSC
+
+Stosuj [standard GitHub Pages](docs/pages.md) dla treści w osobnym `pages/` oraz [procedurę wydań](docs/releases.md) dla wersji manuskryptów, pakietów źródeł, reprodukowalności i GitHub Releases. Odróżniaj wersję szablonu od wersji konkretnego artykułu. Każdy `P01…` może mieć własny numer wersji, datę kompilacji i dokładny SHA. PDF umieszczaj na stronie **dopiero po zgodzie na upublicznienie tej wersji** i kontroli praw wydawcy.
+
+Przed zatwierdzeniem sprawdź listę źródeł publicznych, pełny wynik `_site/`, metadane obrazów/PDF, bibliografię, statusy naukowe, licencje, udokumentowane dowody testów i niezależną recenzję. `--phase publish` nie publikuje ani nie podpisuje manuskryptu. GitHub Release, prerejestracja, preprint, zgłoszenie do czasopisma, udostępnienie danych i wdrożenie Pages są **odrębnymi decyzjami**. Szablon nie powinien wykonywać automatycznego wydawania ani deployu.

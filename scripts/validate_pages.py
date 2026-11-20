@@ -5,6 +5,7 @@ Does not publish content, inspect remote Pages settings or certify privacy.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import html
 import json
 import posixpath
@@ -15,8 +16,9 @@ from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 ALLOWED_EXT = {".md", ".html", ".css", ".js", ".svg", ".png", ".jpg",
-               ".jpeg", ".webp", ".avif", ".ico"}
+               ".jpeg", ".webp", ".avif", ".ico", ".pdf"}
 TEXT_EXT = {".md", ".html", ".css", ".js", ".svg"}
+IMAGE_EXT = {".png", ".jpg", ".jpeg", ".webp", ".avif", ".ico"}
 UNSAFE_SEGMENTS = {"docs", "research", "manuscripts", "software",
                    "data", "results", "equipment", "secrets", "credentials",
                    "private", "raw", "students", "participants",
@@ -38,6 +40,11 @@ BANNED = (
     re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----"),
     re.compile(r"(?<![A-Za-z0-9])gh[pousr]_[A-Za-z0-9_]{36,}(?![A-Za-z0-9_])"),
     re.compile(r"(?<![A-Za-z0-9])AKIA[0-9A-Z]{16}(?![0-9A-Z])"),
+    re.compile(r"\b(?:asystenc\w*\s+AI|ChatGPT|Copilot|AI\s+agent|AI\s+assistant)\b"
+               r"\s*[,;:-]?\s*(?:wykonaj|zmień|popraw|zaktualizuj|usuń|dodaj|napisz|"
+               r"create|update|ignore|rewrite|remove|edit|write)\b", re.I),
+    re.compile(r"<\s*/?\s*(?:script|iframe|object|embed|form|meta|base)\b|"
+               r"\bon[a-z]+\s*=|\b(?:javascript|vbscript)\s*:", re.I),
 )
 
 
@@ -144,33 +151,43 @@ def unsafe_public_reference(target: str, source: str, allowed: set[str]) -> bool
 
 
 def parse_mkdocs(text: str) -> tuple[dict[str, str], list[str], list[str]]:
-    """Allow only a small, transparent subset of MkDocs YAML; reject plugins/hooks."""
+    """Only a transparent, offline MkDocs configuration is supported."""
     keys: dict[str, str] = {}
     navigation: list[str] = []
     errors: list[str] = []
-    in_nav = False
+    mode = ""
+    theme: dict[str, str] = {}
     for line in text.splitlines():
         if not line.strip() or line.lstrip().startswith("#"):
             continue
         top = re.fullmatch(r"([a-z_]+):\s*(.*?)\s*", line)
         if top:
-            key, val = top.groups()
-            if key not in {"site_name", "docs_dir", "site_dir", "nav"} or key in keys:
+            key, value = top.groups()
+            if key not in {"site_name", "docs_dir", "site_dir", "nav", "theme"} or key in keys:
                 errors.append("PAGES CONFIG: unreviewed or duplicate config key")
             else:
-                keys[key] = val.strip("\"'")
-            in_nav = key == "nav"
+                keys[key] = value.strip("\"'")
+            mode = key if key in {"nav", "theme"} else ""
             continue
-        item = re.fullmatch(r"  - [^:]+:\s*([A-Za-z0-9_./-]+\.md)\s*", line)
-        if in_nav and item:
-            navigation.append(item.group(1))
-            continue
+        if mode == "nav":
+            item = re.fullmatch(r"  - [^:]+:\s*([A-Za-z0-9_./-]+\.md)\s*", line)
+            if item:
+                navigation.append(item.group(1))
+                continue
+        if mode == "theme":
+            field = re.fullmatch(r"  (name|highlightjs):\s*([a-z]+)\s*", line)
+            if field and field.group(1) not in theme:
+                theme[field.group(1)] = field.group(2)
+                continue
         errors.append("PAGES CONFIG: unreviewed YAML content")
     if keys.get("docs_dir") != "pages" or keys.get("site_dir") != "_site":
         errors.append("PAGES CONFIG: isolated docs_dir/pages and site_dir/_site required")
     if not keys.get("site_name") or "nav" not in keys or not navigation:
         errors.append("PAGES CONFIG: site name or navigation missing")
+    if keys.get("theme") != "" or theme != {"name": "mkdocs", "highlightjs": "false"}:
+        errors.append("PAGES CONFIG: approved offline theme required")
     return keys, navigation, errors
+
 
 
 def check_pages(root: Path = ROOT) -> list[str]:
@@ -190,6 +207,24 @@ def check_pages(root: Path = ROOT) -> list[str]:
         return sorted(set(errors + ["PAGES POLICY: unsafe public file allowlist"]))
     if len(allowed) != len(set(allowed)) or "index.md" not in allowed:
         errors.append("PAGES POLICY: duplicate or missing index")
+    approved_theme = data.get("approved_theme_assets")
+    approved_images = data.get("approved_image_sha256")
+    approved_pdfs = data.get("approved_pdf_sha256")
+    if (not isinstance(approved_theme, dict) or not approved_theme or
+            not isinstance(approved_images, dict) or
+            not isinstance(approved_pdfs, dict) or
+            any(not isinstance(k, str) or not isinstance(v, str) or
+                not re.fullmatch(r"[0-9a-f]{64}", v)
+                for k, v in approved_theme.items()) or
+            any(not isinstance(k, str) or k not in allowed or
+                PurePosixPath(k).suffix.lower() not in IMAGE_EXT or
+                not isinstance(v, str) or not re.fullmatch(r"[0-9a-f]{64}", v)
+                for k, v in approved_images.items()) or
+            any(not isinstance(k, str) or k not in allowed or
+                PurePosixPath(k).suffix.lower() != ".pdf" or
+                not isinstance(v, str) or not re.fullmatch(r"[0-9a-f]{64}", v)
+                for k, v in approved_pdfs.items())):
+        return sorted(set(errors + ["PAGES POLICY: invalid approved asset hashes"]))
     try:
         config = (root / "mkdocs.yml").read_text(encoding="utf-8")
     except (OSError, UnicodeError):
@@ -219,9 +254,30 @@ def check_pages(root: Path = ROOT) -> list[str]:
             if not file.resolve(strict=True).is_relative_to(folder):
                 errors.append("PAGES OUTSIDE SOURCE: " + rel)
                 continue
-            if file.stat().st_size > 2_000_000:
+            max_size = 15_000_000 if file.suffix.lower() == ".pdf" else 2_000_000
+            if file.stat().st_size > max_size:
                 errors.append("PAGES TOO LARGE: " + rel)
                 continue
+            if file.suffix.lower() == ".pdf":
+                pdf = file.read_bytes()
+                if hashlib.sha256(pdf).hexdigest() != approved_pdfs.get(rel):
+                    errors.append("PAGES PDF HASH UNAPPROVED: " + rel)
+                if not pdf.startswith(b"%PDF-") or b"%%EOF" not in pdf[-2048:]:
+                    errors.append("PAGES PDF INVALID: " + rel)
+                if any(marker in pdf for marker in
+                       (b"/JavaScript", b"/OpenAction", b"/Launch", b"/EmbeddedFile",
+                        b"/RichMedia", b"/FileAttachment")):
+                    errors.append("PAGES PDF ACTIVE CONTENT: " + rel)
+            if file.suffix.lower() in IMAGE_EXT:
+                body = file.read_bytes()
+                if hashlib.sha256(body).hexdigest() != approved_images.get(rel):
+                    errors.append("PAGES IMAGE HASH UNAPPROVED: " + rel)
+                # Conservative metadata indicator screen; never a full media audit.
+                if (file.suffix.lower() != ".ico" and
+                        any(marker in body for marker in
+                            (b"Exif\x00\x00", b"eXIf", b"XMP_", b"<x:xmpmeta",
+                             b"http://ns.adobe.com/xap/1.0/", b"tEXt", b"iTXt", b"zTXt"))):
+                    errors.append("PAGES IMAGE METADATA: " + rel)
             if file.suffix.lower() in TEXT_EXT:
                 content = file.read_text(encoding="utf-8")
                 if any(regex.search(content) for regex in BANNED):
