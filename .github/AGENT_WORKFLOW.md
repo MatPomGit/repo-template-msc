@@ -16,6 +16,8 @@ Szablony dokumentów uzupełniaj razem z rzeczywistymi zmianami. Architektura i 
 
 Kontrole szkieletu: `python scripts/validate_repository.py --root . --phase scaffold`, `python scripts/validate_documentation.py`, `python scripts/validate_pages.py`, `python scripts/check_zotero.py --root .` oraz `python -m unittest discover -s tests -v`. Na CI nie uruchamiaj nieznanych skryptów z nieufnego PR z dostępem do sekretów/stałego runnera. Dla realnego manuskryptu sprawdź osobno PDF/LaTeX/BibTeX, wyniki liczbowe, dane i zgodność z profilem czasopisma.
 
+**Prywatne repozytoria:** domyślny job Actions jest `SKIPPED`; nie jest to `PASS`. Przed merge zmian R2/R3 wymagaj niezależnie zapisanych wyników kompletu wyżej wymienionych testów na exact HEAD w zatwierdzonym, izolowanym środowisku. Bez tych dowodów oznacz `BLOCKED`, nie obchodź bramki przez bezpośredni push. Nie uruchamiaj niezaufanych PR na stałym runnerze ani nie używaj płatnego CI bez zgody. Szczegóły: [konfiguracja](../TEMPLATE_SETUP.md).
+
 Każdy rezultat ma właściwe SHA, polecenie, środowisko, `PASS/FAIL/NOT_RUN/UNAVAILABLE/SKIPPED`. Recenzent sprawdza finalny diff, pochodzenie danych, metodologię i rzeczywiste dowody; wykonawca nie deklaruje własnego przeglądu jako niezależny. `COMMENTED` nie jest formalnym `APPROVED`, a zielony CI nie daje zgody etycznej ani prawa do wydania.
 
 ## Integracja i publikacja

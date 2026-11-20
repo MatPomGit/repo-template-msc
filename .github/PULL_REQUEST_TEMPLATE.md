@@ -8,7 +8,7 @@ Czy zmieniono hipotezy, protokół, SAP, zgodę etyczną, dobór prób, dane, DO
 
 ## Kontrole
 
-SHA bazowy i HEAD; wykonane testy i ich rzeczywisty wynik; weryfikacja aktualności submodułów; zgodność z szablonem; brak danych uczestników; wpływ na GitHub Pages.
+SHA bazowy i HEAD; wykonane testy i ich rzeczywisty wynik (`SKIPPED` nie jest `PASS`, dla prywatnego MSC wymagaj izolowanego dowodu na exact SHA); weryfikacja aktualności submodułów; zgodność z szablonem; brak danych uczestników; wpływ na GitHub Pages.
 
 ## Autoryzacja
 

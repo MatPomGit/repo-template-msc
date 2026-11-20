@@ -5,9 +5,13 @@ Does not publish content, inspect remote Pages settings or certify privacy.
 from __future__ import annotations
 
 import argparse
+import html
 import json
+import posixpath
 import re
+from html.parser import HTMLParser
 from pathlib import Path, PurePosixPath
+from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 ALLOWED_EXT = {".md", ".html", ".css", ".js", ".svg", ".png", ".jpg",
@@ -47,6 +51,96 @@ def safe_relative(value: object) -> bool:
         item not in {".", "..", ""} and not item.startswith(".")
         and item.lower() not in UNSAFE_SEGMENTS for item in parts
     ) and PurePosixPath(value).suffix.lower() in ALLOWED_EXT
+
+
+# Validate link destinations in addition to the source-file allowlist. This is a
+# conservative static check; final rendered HTML still requires a human review.
+PRIVATE_LINK_SEGMENTS = UNSAFE_SEGMENTS | {
+    ".github", "config", "scripts", "tests", "project_state.yaml",
+    "architecture.md", "security.md", "research.md", "reproducibility.md",
+    "template_setup.md", "governance.md", "agent_workflow.md",
+}
+MD_INLINE_TARGET = re.compile(
+    r"!?\[[^\]\n]*\]\(\s*(?:<([^>\n]+)>|([^\s)\n]+))"
+)
+MD_REFERENCE_TARGET = re.compile(
+    r"(?m)^\s{0,3}\[[^\]\n]+\]:\s*(?:<([^>\n]+)>|(\S+))"
+)
+CSS_TARGET = re.compile(
+    r"\burl\(\s*(?:[\"']([^\"']+)[\"']|([^\"'\s)]+))\s*\)", re.I
+)
+CSS_IMPORT = re.compile(r"@import\s+[\"']([^\"']+)[\"']", re.I)
+
+
+class _HtmlLinks(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.targets: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        for key, value in attrs:
+            if value is None:
+                continue
+            if key in {"href", "src", "poster", "action", "formaction"}:
+                self.targets.append(value)
+            elif key == "srcset":
+                self.targets.extend(item.strip().split()[0] for item in value.split(",")
+                                    if item.strip())
+
+
+def extract_targets(content: str) -> list[str]:
+    targets: list[str] = []
+    for pattern in (MD_INLINE_TARGET, MD_REFERENCE_TARGET, CSS_TARGET, CSS_IMPORT):
+        targets.extend(next((v for v in match.groups() if v is not None), "")
+                       for match in pattern.finditer(content))
+    parser = _HtmlLinks()
+    parser.feed(content)
+    targets.extend(parser.targets)
+    return targets
+
+
+def unsafe_public_reference(target: str, source: str, allowed: set[str]) -> bool:
+    """Reject non-allowlisted local destinations and GitHub source-file links."""
+    url = unquote(html.unescape(target.strip().strip("<>")))
+    if not url or url.startswith("#"):
+        return False
+    if "\\" in url or "\0" in url:
+        return True
+    try:
+        parsed = urlsplit(url)
+    except ValueError:
+        return True
+    if parsed.scheme in {"mailto", "tel"}:
+        return False
+    if parsed.scheme and parsed.scheme not in {"http", "https"}:
+        return True
+    if parsed.scheme in {"http", "https"} and not parsed.netloc:
+        return True
+    if parsed.netloc:
+        host = (parsed.hostname or "").lower()
+        segments = [unquote(part).lower() for part in parsed.path.split("/") if part]
+        if host == "github.com" and len(segments) >= 4 and segments[2] in {"blob", "raw", "tree"}:
+            repo_path = segments[3:]
+        elif host == "raw.githubusercontent.com" and len(segments) >= 4:
+            repo_path = segments[2:]
+        elif host == "api.github.com" and len(segments) >= 5 and segments[:1] == ["repos"] and "contents" in segments:
+            repo_path = segments[segments.index("contents") + 1:]
+        else:
+            return False
+        return any(part in PRIVATE_LINK_SEGMENTS for part in repo_path)
+    path = unquote(parsed.path)
+    if not path or path == "/":
+        return False
+    if "\\" in path or "\0" in path or any(item == ".." for item in path.split("/")):
+        return True
+    if path.startswith("/"):
+        relative = posixpath.normpath(path.lstrip("/"))
+    else:
+        relative = posixpath.normpath(posixpath.join(posixpath.dirname(source), path))
+    parts = relative.lower().split("/")
+    return (relative.startswith("../") or relative in {"..", "."}
+            or any(part in PRIVATE_LINK_SEGMENTS for part in parts)
+            or relative not in allowed)
 
 
 def parse_mkdocs(text: str) -> tuple[dict[str, str], list[str], list[str]]:
@@ -132,8 +226,8 @@ def check_pages(root: Path = ROOT) -> list[str]:
                 content = file.read_text(encoding="utf-8")
                 if any(regex.search(content) for regex in BANNED):
                     errors.append("PAGES EDITORIAL OR AGENT CONTENT: " + rel)
-                if re.search(r"\.\./|file://|https?://\S*(?:/AGENTS\.md|/\.github/|/research/|/docs/)",
-                             content, re.I):
+                if any(unsafe_public_reference(target, rel, set(allowed))
+                       for target in extract_targets(content)):
                     errors.append("PAGES INTERNAL REFERENCE: " + rel)
         except (OSError, UnicodeError):
             errors.append("PAGES UNREADABLE: " + rel)

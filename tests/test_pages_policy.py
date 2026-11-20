@@ -105,6 +105,51 @@ class PagesPolicyTests(unittest.TestCase):
             self.assertIn("PAGES CONFIG: navigation contains unapproved source",
                           pages.check_pages(root))
 
+    def test_private_link_targets_rejected(self):
+        blocked = (
+            "[Protokół](/research/protocol.md)",
+            "[Dokumentacja](/docs/architecture/README.md)",
+            "[Metadane](https://github.com/owner/project/blob/main/PROJECT_STATE.yaml)",
+            "[Polityka](https://raw.githubusercontent.com/owner/project/main/docs/pages.md)",
+            "[Protokół][sap]\n\n[sap]: /research/protocol.md",
+            '<a href="/docs/architecture/README.md">Architektura</a>',
+            '<img src="https://github.com/owner/project/blob/main/research/ethics.md">',
+            "![Wykres](%2Fresearch%2Fprotocol.md)",
+            "Zasób: [wyniki](../results/report.md)",
+            '<link rel="stylesheet" href="/config/private.css">',
+            "CSS: url('/docs/figure.svg')",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self.fixture(Path(tmp) / "msc")
+            for sample in blocked:
+                with self.subTest(sample=sample):
+                    (root / "pages/index.md").write_text(sample, encoding="utf-8")
+                    self.assertIn("PAGES INTERNAL REFERENCE: index.md",
+                                  pages.check_pages(root))
+
+    def test_only_allowlisted_local_targets_accepted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self.fixture(Path(tmp) / "msc")
+            policy = root / "config/pages-policy.json"
+            cfg = json.loads(policy.read_text(encoding="utf-8"))
+            cfg["public_files"].append("methods.md")
+            policy.write_text(json.dumps(cfg), encoding="utf-8")
+            (root / "pages/methods.md").write_text("# Metody\n", encoding="utf-8")
+            (root / "pages/index.md").write_text(
+                "[Metody](methods.md) [Start](/index.md) "
+                "[Kontakt](mailto:example@example.org) "
+                '<a href="https://example.org/public">Zewnętrzny</a>',
+                encoding="utf-8")
+            self.assertEqual([], pages.check_pages(root))
+
+    def test_unapproved_local_target_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self.fixture(Path(tmp) / "msc")
+            (root / "pages/index.md").write_text(
+                "[Nieznane](unlisted.md)", encoding="utf-8")
+            self.assertIn("PAGES INTERNAL REFERENCE: index.md",
+                          pages.check_pages(root))
+
 
 if __name__ == "__main__":
     unittest.main()

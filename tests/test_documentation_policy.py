@@ -108,6 +108,17 @@ class DocumentationTests(unittest.TestCase):
             self.assertTrue(any("DOC LENGTH EXCEEDED: legacy/protokol.md" in e
                                 for e in validator.check_documentation(root)))
 
+    def test_missing_migrated_protocol_is_rejected_by_standalone_validator(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self.fixture(Path(tmp) / "msc")
+            state = root / "PROJECT_STATE.yaml"
+            state.write_text(state.read_text().replace(
+                "protocol_path: research/protocol.md",
+                "protocol_path: legacy/protokol.md"), encoding="utf-8")
+            (root / "research/protocol.md").unlink()
+            self.assertIn("DOC MISSING: legacy/protokol.md",
+                          validator.check_documentation(root))
+
 
 if __name__ == "__main__":
     unittest.main()

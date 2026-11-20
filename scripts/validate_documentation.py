@@ -101,13 +101,14 @@ def check_documentation(root: Path = ROOT) -> list[str]:
             elif rel not in mapped.values():
                 selected[rel] = min(limit, selected[rel])
 
+    required = set(exact) - set(mapped) | set(mapped.values())
     for rel, limit in sorted(selected.items()):
         file = root / rel
         if file.is_symlink():
             errors.append("DOC SYMLINK: " + rel)
             continue
         if not file.is_file():
-            if rel in exact:
+            if rel in required:
                 errors.append("DOC MISSING: " + rel)
             continue
         try:
