@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "source_dir": "pages",
+  "output_dir": "_site",
+  "mkdocs_config": "mkdocs.yml",
+  "public_files": [
+    "index.md"
+  ],
+  "note": "Explicit content allowlist, no auto-publishing. Public manuscript content requires scientific and privacy review."
+}

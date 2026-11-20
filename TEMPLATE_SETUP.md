@@ -5,12 +5,18 @@ Ten katalog stanowi kompletny, przenośny **szkielet repozytorium `msc-*`**. Prz
 1. Utwórz prywatne lub publiczne repo `msc-<krótki-temat>`; przed publikacją wybierz politykę danych i praw.
 2. Skopiuj zawartość katalogu szablonu do nowego repo (łącznie z `.github`, `.gitignore`, `.gitattributes`). Nie kopiuj otaczającego repozytorium Research Autopilot, historii jego commitów ani jego sekretów.
 3. Zastąp `REPLACE_PROJECT_ID`, `REPLACE_OWNER`, tytuły, program ARC i licencję. Zachowaj Mateusza Pomianka jako autora podstawowego; zweryfikowanych współautorów dopisz do `CITATION.cff` i metadanych każdego odpowiedniego manuskryptu. Wypełnij `research/protocol.md`, `research/analysis-plan.md`, `research/ethics.md` i `software/dependencies.yaml`.
-4. Uruchom `python scripts/validate_repository.py --root . --phase scaffold` oraz `python -m unittest discover -s tests -v`. Wynik PASS oznacza **strukturę**, nie gotowość badania.
+4. Uruchom `python scripts/validate_repository.py --root . --phase scaffold`, `python scripts/validate_documentation.py`, `python scripts/validate_pages.py` i `python -m unittest discover -s tests -v`. Wynik PASS oznacza **strukturę**, nie gotowość badania.
 5. Jeśli GitHub otrzyma osobne repo oznaczone jako **Template repository**, można tworzyć nowe repozytoria przyciskiem `Use this template` lub GitHub CLI. Kopiowana jest zawartość plików, **nie** historia źródłowego projektu. Włączanie `is_template` wymaga odpowiednich uprawnień administracyjnych; sama struktura folderu nie ustawia flagi GitHub.
-6. Uzupełnij i zatwierdź źródła, prawa oraz witrynę. Uruchom `--phase publish` przed publikacją publicznej części. Walidator nie ocenia etyki, cytowań ani wartości naukowej; wymaga oddzielnego audytu.
+6. Uzupełnij i zatwierdź źródła, prawa oraz [publiczną witrynę](docs/pages.md). `pages/` zawiera wyłącznie odrębnie przejrzane materiały dla odwiedzających, a `docs/` nie może być publikowanym źródłem. Każdy zasób dodaj do `config/pages-policy.json`. Uruchom `--phase publish` przed odrębnym zatwierdzeniem publicznej części. Walidacja nie publikuje strony ani artykułu. Walidator nie ocenia etyki, cytowań ani wartości naukowej; wymaga oddzielnego audytu.
 7. Program `arc-*` może odwoływać się do projektu linkiem lub submodułem przypiętym SHA. Nowe repo **nie jest** submodułem automatycznie. Wybór repo nadrzędnego wymaga zgodności z jego polityką WIP oraz prywatnością.
 
 **Uwaga:** w trybie scaffold README dopuszcza `NOT_COLLECTED`, `NOT_REGISTERED` i inne uczciwe stany. Nie należy wpisywać fikcyjnego DOI ani wyniku tylko po to, aby spełnić schemat. `publish` sprawdza konfigurację szablonu, nie akceptację naukową.
+
+## Kontrakty dla rozwijających się projektów MSC
+
+Po utworzeniu manuskryptu zaktualizuj [architekturę](ARCHITECTURE.md), [przepływy danych](docs/architecture/data-flow.md), [reprodukowalność](docs/architecture/reproducibility.md), [model zagrożeń](docs/security/threat-model.md) i właściwe [ADR](docs/adr/README.md), nie powielając `research/decisions.md`. Przed pierwszymi badaniami sprawdź protokół, SAP, etykę i prawa do materiałów. Przed wydaniem zweryfikuj zamrożone SHA danych i kodu, Zotero, kompilację LaTeX, licencje i kanał zgłoszeń. Stosuj [limity znaków](docs/documentation.md).
+
+GitHub Pages wymaga osobnego `pages/` i ręcznego audytu treści/widoczności. Nigdy nie konfiguruj publikacji z `main:/docs` ani z korzenia repo, również gdy repozytorium jest prywatne. Nie publikuj na stronie instrukcji dla agentów, uwag redakcyjnych ani niezatwierdzonych wyników. Szablon nie zawiera i nie potrzebuje pliku `CONTRIBUTING.md`.
 
 ## Autorstwo i współautorstwo
 

@@ -1,5 +1,13 @@
-# Projekt badawczy
+# Dokumentacja wewnętrzna projektu MSC
 
-Ta strona publikuje tylko zatwierdzone informacje o celu, protokole, metodach, aparaturze, stanie badań, prerejestracjach i publikacjach. Nie zawiera poufnych szczegółów etycznych, danych uczestników, odpowiedzi z kwestionariuszy ani prywatnej korespondencji.
+Ten katalog przechowuje informacje naukowe, techniczne i operacyjne, które **nie są automatycznie przeznaczone do publikacji**. Nie należy udostępniać go bezpośrednio przez GitHub Pages.
 
-**Stan:** koncepcja, bez zatwierdzonych wyników. **Strona:** projekt szablonowy, nieoficjalna witryna projektu.
+- [Architektura](architecture/README.md)
+- [Reprodukowalność](architecture/reproducibility.md)
+- [Model zagrożeń](security/threat-model.md)
+- [Rejestr ADR](adr/README.md)
+- [Publikacja Pages](pages.md)
+- [Limity dokumentacji](documentation.md)
+- [Formaty czasopism](journal-formats.md)
+- [Zotero](zotero.md)
+- [Stan artefaktów](outputs.md)
