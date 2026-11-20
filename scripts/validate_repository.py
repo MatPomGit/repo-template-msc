@@ -8,10 +8,24 @@ import re
 import sys
 from pathlib import Path, PurePosixPath
 
+# Works for direct CLI invocation and for isolated module imports in tests.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from validate_documentation import check_documentation
+from validate_pages import check_pages
+
 REQUIRED = (
     "README.md", "AGENTS.md", "ARCHITECTURE.md", "RESEARCH.md",
     "REPRODUCIBILITY.md", "PROJECT_STATE.yaml", "CITATION.cff",
-    "LICENSE", "SECURITY.md", ".gitignore", ".gitattributes",
+    "LICENSE", "SECURITY.md", "CODE_OF_CONDUCT.md", "GOVERNANCE.md",
+    "SUPPORT.md", ".github/AGENT_WORKFLOW.md", ".gitignore", ".gitattributes",
+    "config/pages-policy.json", "config/documentation-policy.json",
+    "pages/index.md", "docs/pages.md", "docs/documentation.md",
+    "docs/architecture/README.md", "docs/architecture/data-flow.md",
+    "docs/architecture/reproducibility.md", "docs/adr/README.md",
+    "docs/adr/0001-research-data-boundaries.md", "docs/security/threat-model.md",
+    "docs/security/incident-response.md", "docs/operations/runbook.md",
+    "scripts/validate_pages.py", "scripts/validate_documentation.py",
+    "tests/test_pages_policy.py", "tests/test_documentation_policy.py",
     "mkdocs.yml", "docs/index.md", "docs/outputs.md",
     "data/README.md", "results/README.md", "equipment/README.md",
     ".github/PULL_REQUEST_TEMPLATE.md",
@@ -189,16 +203,19 @@ def validate(root: Path, phase: str = "scaffold") -> list[str]:
             issues.append("Invalid evidence-register.csv header")
 
     if phase == "publish":
-        for f in ("README.md", "CITATION.cff", "docs/index.md", "mkdocs.yml"):
+        for f in ("README.md", "CITATION.cff", "pages/index.md", "mkdocs.yml"):
             file = root / f
             if file.is_file() and ("REPLACE" in file.read_text(encoding="utf-8") or "[Tytuł" in file.read_text(encoding="utf-8")):
                 issues.append(f"Unresolved template placeholder in {f}")
         if (root / "LICENSE").is_file() and "[WŁAŚCICIEL PRAW]" in (root / "LICENSE").read_text(encoding="utf-8"):
             issues.append("Unresolved copyright holder in LICENSE")
-        for f in ("README.md", "docs/index.md", "docs/outputs.md"):
+        for f in ("README.md", "pages/index.md", "docs/outputs.md"):
             file = root / f
             if file.is_file() and ("NOT_CONFIGURED" in file.read_text(encoding="utf-8") or "REPLACE" in file.read_text(encoding="utf-8")):
                 issues.append(f"Publication metadata requires review: {f}")
+
+    issues.extend(check_documentation(root))
+    issues.extend(check_pages(root))
 
     for p in root.rglob("*"):
         if not p.is_file() or p.is_symlink():
