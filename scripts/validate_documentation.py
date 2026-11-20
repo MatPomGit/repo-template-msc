@@ -49,7 +49,7 @@ def scientific_document_mappings(root: Path, errors: list[str]) -> dict[str, str
         return {}
     result: dict[str, str] = {}
     for standard, field in SCIENTIFIC_DOCUMENT_PATHS.items():
-        match = re.search(r"(?m)^" + re.escape(field) + r":\\s*([^\\r\\n#]*)", value)
+        match = re.search(r"(?m)^" + re.escape(field) + r":\s*([^\r\n#]*)", value)
         mapped = (match.group(1).strip().strip("'\\\"") if match else "") or standard
         if not _valid_rel_path(mapped) or not mapped.endswith(".md"):
             errors.append("DOC POLICY: unsafe scientific document mapping " + field)
