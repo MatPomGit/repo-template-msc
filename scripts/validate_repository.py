@@ -19,7 +19,7 @@ REQUIRED = (
     "LICENSE", "SECURITY.md", "CODE_OF_CONDUCT.md", "GOVERNANCE.md",
     "SUPPORT.md", ".github/AGENT_WORKFLOW.md", ".gitignore", ".gitattributes",
     "config/pages-policy.json", "config/documentation-policy.json",
-    "pages/index.md", "docs/pages.md", "docs/documentation.md",
+    "pages/index.md", "docs/pages.md", "docs/releases.md", "docs/documentation.md",
     "docs/architecture/README.md", "docs/architecture/data-flow.md",
     "docs/architecture/reproducibility.md", "docs/adr/README.md",
     "docs/adr/0001-research-data-boundaries.md", "docs/security/threat-model.md",

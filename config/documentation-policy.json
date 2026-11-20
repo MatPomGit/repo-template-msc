@@ -34,7 +34,8 @@
     "research/data-management.md": 10000,
     "research/preregistration.md": 8500,
     "research/decisions.md": 12000,
-    "pages/index.md": 6000
+    "pages/index.md": 6000,
+    "docs/releases.md": 9600
   },
   "glob_limits": {
     "docs/**/*.md": 10000,

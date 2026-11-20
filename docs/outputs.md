@@ -8,3 +8,5 @@
 | Zatwierdzone dane otwarte | Nie opublikowano | Brak |
 
 Po rzeczywistej publikacji wpisz identyfikatory DOI/arXiv/OSF i jawne warunki dostępu. Nie publikuj żadnego surowego zbioru z danymi zdrowotnymi lub umożliwiającymi reidentyfikację bez weryfikacji praw i etyki.
+
+Wydanie wersjonowanego artefaktu projektu, publiczny PDF, preprint, zgłoszenie do czasopisma i udostępnienie danych są oddzielnymi operacjami. Zasady wydawania, dowodów i dopuszczenia opisuje [procedura MSC](releases.md).

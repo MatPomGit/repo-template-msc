@@ -30,7 +30,7 @@ Strona projektu: **NOT_CONFIGURED**. Prerejestracja: **NOT_REGISTERED**. Preprin
 
 ## Architektura, bezpieczeństwo i dokumentacja
 
-[Architektura projektu](ARCHITECTURE.md), [ADR](docs/adr/README.md), [ryzyka bezpieczeństwa](docs/security/threat-model.md), [zasady ochrony danych](SECURITY.md), [zarządzanie](GOVERNANCE.md), [standard dokumentacji](docs/documentation.md) i [polityka Pages](docs/pages.md). Materiały dla agentów pozostają poza witryną.
+[Architektura projektu](ARCHITECTURE.md), [ADR](docs/adr/README.md), [ryzyka bezpieczeństwa](docs/security/threat-model.md), [zasady ochrony danych](SECURITY.md), [zarządzanie](GOVERNANCE.md), [standard dokumentacji](docs/documentation.md) [GitHub Pages](docs/pages.md) i [wydania naukowe](docs/releases.md). Materiały dla agentów pozostają poza witryną.
 
 ## Uruchamianie i jakość
 
