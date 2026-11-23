@@ -48,3 +48,7 @@ Nie mieszaj stanów `PASS`, `FAIL`, `NOT_RUN`, `SKIPPED`, `UNAVAILABLE`, `NOT_AP
 ## Dokumentacja i limity
 
 Stosuj [standard dokumentacji](docs/documentation.md), [budżety znaków](config/documentation-policy.json) i test `python scripts/validate_documentation.py`. `ARCHITECTURE.md` opisuje rzeczywistą organizację badania, ADR architektoniczne nie zastępują naukowego `research/decisions.md`, a `SECURITY.md` dotyczy podatności i ochrony danych. Podczas tworzenia manuskryptu opisuj fakty, aktualny protokół, badania w toku i rzeczywiste dowody. Nie uznawaj dokumentu-szkieletu za zaakceptowany protokół, ocenę ryzyka ani raport pomiarowy.
+
+## Właściciel naukowy i autorstwo każdego manuskryptu
+
+Dla każdego nowego projektu utworzonego z tego szablonu ustaw rzeczywiste `scientific_owner` w `PROJECT_STATE.yaml` (w projektach Mateusza Pomianka: `Mateusz Pomianek`, konto `MatPomGit`) i zachowaj tę samą informację w metadanych każdej własnej publikacji oraz README manuskryptu. Nie pozostawiaj `REPLACE_OWNER` w gotowym repozytorium projektu. W źródłach manuskryptu podawaj zweryfikowanych autorów; właściciel naukowy nie jest automatycznie wyłącznym autorem ani właścicielem praw. Nie usuwaj potwierdzonych współautorów, nie przepisuj autorstwa cudzych prac. Repozytorium kanoniczne i status dowodowy są odrębnymi polami. Przed zakończeniem prac sprawdzaj spójność tych deklaracji w całym portfolio projektu.
